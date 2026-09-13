@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "BIS-SATHI",
+    "slug": "BIS-SATHI",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E6F4FE"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.gov.bis.sathi"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#E6F4FE"
+      },
+      "package": "in.gov.bis.sathi",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/fevicon.png"
+    }
+  }
+}

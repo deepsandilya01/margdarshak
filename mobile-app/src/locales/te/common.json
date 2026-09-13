@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "ప్రమాణాలు, ఉత్పత్తులు, QCO, ప్రయోగశాలలను శోధించండి...",
+    "language": "భాష",
+    "login": "లాగిన్ చేయండి"
+  },
+  "nav": {
+    "standards": "స్టాండర్డ్స్ ఎక్స్‌ప్లోరర్",
+    "products": "ఉత్పత్తులు",
+    "qcos": "QCO",
+    "laboratories": "లేబొరేటరీ ఫైండర్",
+    "certification": "ధృవీకరణ",
+    "hallmarking": "హాల్‌మార్కింగ్",
+    "aiSathi": "AI సాథి",
+    "consumer_help": "వినియోగదారు సహాయం",
+    "resources": "వనరులు"
+  },
+  "footer": {
+    "quickLinks": "త్వరిత లింక్‌లు",
+    "about": "BIS గురించి",
+    "contact": "మమ్మల్ని సంప్రదించండి",
+    "help": "సహాయం & మద్దతు"
+  }
+}

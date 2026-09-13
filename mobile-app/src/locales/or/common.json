@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "ମାନକ, ଉତ୍ପାଦ, QCO, ପରୀକ୍ଷାଗାର ଖୋଜନ୍ତୁ...",
+    "language": "ଭାଷା",
+    "login": "ଲଗଇନ୍ କରନ୍ତୁ"
+  },
+  "nav": {
+    "standards": "ଷ୍ଟାଣ୍ଡାର୍ଡ୍ସ ଏକ୍ସପ୍ଲୋରର୍",
+    "products": "ଉତ୍ପାଦ",
+    "qcos": "QCO",
+    "laboratories": "ଲାବୋରେଟୋରୀ ଫାଇଣ୍ଡର୍",
+    "certification": "ପ୍ରମାଣପତ୍ର",
+    "hallmarking": "ହଲମାର୍କିଂ",
+    "aiSathi": "AI ସାଥୀ",
+    "consumer_help": "ଗ୍ରାହକ ସହାୟତା",
+    "resources": "ସମ୍ପଦ"
+  },
+  "footer": {
+    "quickLinks": "କ୍ୱିକ୍ ଲିଙ୍କ୍",
+    "about": "BIS ବିଷୟରେ",
+    "contact": "ଆମ ସହିତ ଯୋଗାଯୋଗ କରନ୍ତୁ",
+    "help": "ସାହାଯ୍ୟ ଏବଂ ସମର୍ଥନ"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "মান, পণ্য, QCO, পরীক্ষাগার খুঁজুন...",
+    "language": "ভাষা",
+    "login": "লগইন করুন"
+  },
+  "nav": {
+    "standards": "স্ট্যান্ডার্ড এক্সপ্লোরার",
+    "products": "পণ্য",
+    "qcos": "QCO",
+    "laboratories": "ল্যাবরেটরি ফাইন্ডার",
+    "certification": "সার্টিফিকেশন",
+    "hallmarking": "হলমার্কিং",
+    "aiSathi": "AI সাথী",
+    "consumer_help": "ভোক্তা সহায়তা",
+    "resources": "সম্পদ"
+  },
+  "footer": {
+    "quickLinks": "কুইক লিংক",
+    "about": "BIS সম্পর্কে",
+    "contact": "আমাদের সাথে যোগাযোগ করুন",
+    "help": "সাহায্য ও সমর্থন"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "hero": {
+    "overline": "BIS પ્રમાણિત પ્લેટફોર્મ",
+    "headline": "BIS અનુપાલન સરળ બનાવવું",
+    "subheading": "અમારા AI-સંચાલિત પ્લેટફોર્મ સાથે ભારતીય ધોરણો, QCOs અને પ્રમાણપત્રના જટિલ લેન્ડસ્કેપને વિના પ્રયાસે નેવિગેટ કરો.",
+    "cta_standards": "ધોરણો અન્વેષણ કરો",
+    "cta_ai": "AI સાથીને પૂછો"
+  },
+  "search": {
+    "placeholder": "ધોરણો, ઉત્પાદનો, QCOs, પ્રયોગશાળાઓ શોધો...",
+    "btn": "શોધો",
+    "popular": "લોકપ્રિય:"
+  },
+  "discover": {
+    "overline": "ઉત્પાદન લાગુ પડવું",
+    "title": "લાગુ ધોરણો શોધો",
+    "subtitle": "નિયમનકારી આદેશોને તરત જ ઉકેલવા માટે તમારી ઉત્પાદન શ્રેણી, પર્યાવરણ અને પરિમાણો પસંદ કરો.",
+    "step1": "શ્રેણી",
+    "step2": "પર્યાવરણ",
+    "step3": "પરિમાણો",
+    "required": "જરૂરી",
+    "resolution_title": "વૈધાનિક ઠરાવ",
+    "resolution_label": "લાઇવ",
+    "resolved_mandate": "ઉકેલાયેલ આદેશ",
+    "launch": "ડિસ્કવરી લોંચ કરો"
+  },
+  "standards": {
+    "filter_all": "બધા",
+    "filter_mandatory": "ફરજિયાત",
+    "filter_electro": "ઇલેક્ટ્રો",
+    "filter_mechanical": "મિકેનિકલ",
+    "filter_civil": "સિવિલ",
+    "identifier": "આઇડેન્ટિફાયર",
+    "title_col": "શીર્ષક",
+    "division": "વિભાગ",
+    "legal_status": "કાનૂની સ્થિતિ",
+    "lab_network": "લેબ નેટવર્ક",
+    "actions": "ક્રિયાઓ",
+    "view_scope": "વ્યાપ જુઓ"
+  }
+}

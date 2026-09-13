@@ -1,0 +1,41 @@
+{
+  "hero": {
+    "overline": "BIS Certified Platform",
+    "headline": "Simplifying BIS Compliance",
+    "subheading": "Navigate the complex landscape of Indian Standards, Quality Control Orders, and Certification effortlessly with our AI-powered platform.",
+    "cta_standards": "Explore Standards",
+    "cta_ai": "Ask AI Sathi"
+  },
+  "search": {
+    "placeholder": "Search standards, products, QCOs, laboratories...",
+    "btn": "Search",
+    "popular": "POPULAR:"
+  },
+  "discover": {
+    "overline": "PRODUCT APPLICABILITY",
+    "title": "Find Applicable Standards",
+    "subtitle": "Select your product category, environment, and parameters to instantly resolve regulatory mandates.",
+    "step1": "Category",
+    "step2": "Environment",
+    "step3": "Parameters",
+    "required": "REQUIRED",
+    "resolution_title": "Statutory Resolution",
+    "resolution_label": "LIVE",
+    "resolved_mandate": "Resolved Mandate",
+    "launch": "Launch Discovery"
+  },
+  "standards": {
+    "filter_all": "All",
+    "filter_mandatory": "Mandatory",
+    "filter_electro": "Electro",
+    "filter_mechanical": "Mechanical",
+    "filter_civil": "Civil",
+    "identifier": "Identifier",
+    "title_col": "Title",
+    "division": "Division",
+    "legal_status": "Legal Status",
+    "lab_network": "Lab Network",
+    "actions": "Actions",
+    "view_scope": "View Scope"
+  }
+}

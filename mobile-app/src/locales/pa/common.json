@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "ਮਿਆਰ, ਉਤਪਾਦ, QCO, ਪ੍ਰਯੋਗਸ਼ਾਲਾਵਾਂ ਖੋਜੋ...",
+    "language": "ਭਾਸ਼ਾ",
+    "login": "ਲਾਗਇਨ ਕਰੋ"
+  },
+  "nav": {
+    "standards": "ਸਟੈਂਡਰਡਜ਼ ਐਕਸਪਲੋਰਰ",
+    "products": "ਉਤਪਾਦ",
+    "qcos": "QCO",
+    "laboratories": "ਲੈਬੋਰੇਟਰੀ ਫਾਈਂਡਰ",
+    "certification": "ਪ੍ਰਮਾਣੀਕਰਣ",
+    "hallmarking": "ਹਾਲਮਾਰਕਿੰਗ",
+    "aiSathi": "AI ਸਾਥੀ",
+    "consumer_help": "ਖਪਤਕਾਰ ਸਹਾਇਤਾ",
+    "resources": "ਸਰੋਤ"
+  },
+  "footer": {
+    "quickLinks": "ਤੁਰੰਤ ਲਿੰਕ",
+    "about": "BIS ਬਾਰੇ",
+    "contact": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+    "help": "ਮਦਦ ਅਤੇ ਸਹਾਇਤਾ"
+  }
+}

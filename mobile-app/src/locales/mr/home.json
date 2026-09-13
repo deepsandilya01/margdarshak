@@ -1,0 +1,41 @@
+{
+  "hero": {
+    "overline": "BIS प्रमाणित प्लॅटफॉर्म",
+    "headline": "BIS अनुपालन सोपे करणे",
+    "subheading": "आमच्या AI-सक्षम प्लॅटफॉर्मसह भारतीय मानके, QCO आणि प्रमाणपत्राच्या जटिल लँडस्केपवर सहजतेने नेव्हिगेट करा.",
+    "cta_standards": "मानके एक्सप्लोर करा",
+    "cta_ai": "AI साथीला विचारा"
+  },
+  "search": {
+    "placeholder": "मानके, उत्पादने, QCO, प्रयोगशाळा शोधा...",
+    "btn": "शोधा",
+    "popular": "लोकप्रिय:"
+  },
+  "discover": {
+    "overline": "उत्पादन प्रयोज्यता",
+    "title": "लागू मानके शोधा",
+    "subtitle": "नियामक आदेश त्वरित सोडवण्यासाठी तुमची उत्पादन श्रेणी, पर्यावरण आणि पॅरामीटर्स निवडा.",
+    "step1": "श्रेणी",
+    "step2": "पर्यावरण",
+    "step3": "पॅरामीटर्स",
+    "required": "आवश्यक",
+    "resolution_title": "वैधानिक ठराव",
+    "resolution_label": "थेट",
+    "resolved_mandate": "सोडवलेला आदेश",
+    "launch": "डिस्कव्हरी लाँच करा"
+  },
+  "standards": {
+    "filter_all": "सर्व",
+    "filter_mandatory": "अनिवार्य",
+    "filter_electro": "इलेक्ट्रो",
+    "filter_mechanical": "मेकॅनिकल",
+    "filter_civil": "सिव्हिल",
+    "identifier": "आयडेंटिफायर",
+    "title_col": "शीर्षक",
+    "division": "विभाग",
+    "legal_status": "कायदेशीर स्थिती",
+    "lab_network": "लॅब नेटवर्क",
+    "actions": "कृती",
+    "view_scope": "व्याप्ती पहा"
+  }
+}
