@@ -1,10 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
 
 export default function CertificationPage() {
-  const { t } = useLanguage();
-
   const schemes = [
     {
       id: 'scheme-I',

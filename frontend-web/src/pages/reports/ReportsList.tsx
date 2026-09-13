@@ -1,16 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
-import { TechIdentifier, StatusPill } from '../../components/shared/StatusPill';
+import { Link, useNavigate } from 'react-router-dom';
+import { TechIdentifier, StatusPill } from '@/components/feedback/StatusPill';
+import reportsData from '@/data/reports/reports.json';
+import type { Report } from '@/features/reports/types/report';
 
 export default function ReportsList() {
-  const { t } = useLanguage();
+  const navigate = useNavigate();
 
-  const REPORTS = [
-    { id: 'REP-2025-001', type: 'Dossier Audit', product: 'EV Battery Pack', date: '10 Sep 2025', status: 'compliant' },
-    { id: 'REP-2025-002', type: 'Lab Test Results', product: 'Smartwatch Charger', date: '05 Sep 2025', status: 'pending' },
-    { id: 'REP-2025-003', type: 'QCO Gap Analysis', product: 'AC Motors', date: '22 Aug 2025', status: 'verify' },
-  ];
+  const REPORTS = reportsData as Report[];
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-8 py-8">
@@ -21,7 +18,7 @@ export default function ReportsList() {
         </div>
         <div className="flex items-center justify-between">
           <h1 className="text-headline-lg text-primary tracking-tight">Compliance Reports</h1>
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[14px] font-medium hover:bg-primary-container transition-colors">
+          <button onClick={() => navigate('/ai-sathi')} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-[14px] font-medium hover:bg-primary-container transition-colors">
             <span className="material-symbols-outlined text-[18px]">add</span>
             Generate New Report
           </button>
@@ -46,18 +43,18 @@ export default function ReportsList() {
                   <TechIdentifier code={r.id} size="md" />
                 </td>
                 <td className="py-4 px-5">
-                  <div className="font-semibold text-primary text-[14px]">{r.type}</div>
-                  <div className="text-[12px] text-on-surface-variant">{r.product}</div>
+                  <Link to={`/reports/${r.id}`} className="font-semibold text-primary text-[14px] hover:underline">{r.type}</Link>
+                  <div className="text-[12px] text-on-surface-variant">{r.productContext ?? r.name}</div>
                 </td>
                 <td className="py-4 px-5 whitespace-nowrap font-mono text-[12px] text-on-surface-variant">
-                  {r.date}
+                  {new Date(r.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </td>
                 <td className="py-4 px-5 whitespace-nowrap">
-                  <StatusPill status={r.status as any} size="sm" customLabel={r.status === 'compliant' ? 'Verified' : r.status === 'pending' ? 'In Review' : 'Needs Fixes'} />
+                  <StatusPill status={r.status === 'Final' ? 'compliant' : 'pending'} size="sm" customLabel={r.status} />
                 </td>
                 <td className="py-4 px-5 text-right whitespace-nowrap">
                   <div className="inline-flex items-center gap-1">
-                    <button className="px-2.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-primary font-mono text-[12px] transition-colors flex items-center gap-1.5">
+                    <button onClick={() => window.print()} className="px-2.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-primary font-mono text-[12px] transition-colors flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-[14px]">print</span>
                       Print
                     </button>

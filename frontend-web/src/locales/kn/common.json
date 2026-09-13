@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "ಮಾನದಂಡಗಳು, ಉತ್ಪನ್ನಗಳು, QCO, ಪ್ರಯೋಗಾಲಯಗಳನ್ನು ಹುಡುಕಿ...",
+    "language": "ಭಾಷೆ",
+    "login": "ಲಾಗಿನ್ ಮಾಡಿ"
+  },
+  "nav": {
+    "standards": "ಸ್ಟ್ಯಾಂಡರ್ಡ್ಸ್ ಎಕ್ಸ್‌ಪ್ಲೋರರ್",
+    "products": "ಉತ್ಪನ್ನಗಳು",
+    "qcos": "QCO",
+    "laboratories": "ಲ್ಯಾಬೊರೇಟರಿ ಫೈಂಡರ್",
+    "certification": "ಪ್ರಮಾಣೀಕರಣ",
+    "hallmarking": "ಹಾಲ್‌ಮಾರ್ಕಿಂಗ್",
+    "aiSathi": "AI ಸಾಥಿ",
+    "consumer_help": "ಗ್ರಾಹಕ ಸಹಾಯ",
+    "resources": "ಸಂಪನ್ಮೂಲಗಳು"
+  },
+  "footer": {
+    "quickLinks": "ತ್ವರಿತ ಲಿಂಕ್‌ಗಳು",
+    "about": "BIS ಬಗ್ಗೆ",
+    "contact": "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ",
+    "help": "ಸಹಾಯ ಮತ್ತು ಬೆಂಬಲ"
+  }
+}

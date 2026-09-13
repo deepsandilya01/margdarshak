@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQCOs } from '../../hooks/useQCOs';
-import { useLanguage } from '../../hooks/useLanguage';
-import { StatusPill, TechIdentifier } from '../../components/shared/StatusPill';
-import { EvidenceBadge } from '../../components/shared/EvidenceBadge';
-import { EmptyState } from '../../components/shared/EmptyState';
+import { useQCOs } from '@/features/qco/hooks/useQCOs';
+import { useLanguage } from '@/hooks/useLanguage';
+import { StatusPill, TechIdentifier } from '@/components/feedback/StatusPill';
+import { EvidenceBadge } from '@/features/evidence/components/EvidenceBadge';
+import { EmptyState } from '@/components/feedback/EmptyState';
 
 export default function QCODetail() {
   const { id } = useParams<{ id: string }>();

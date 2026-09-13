@@ -1,0 +1,41 @@
+{
+  "hero": {
+    "overline": "BIS ਪ੍ਰਮਾਣਿਤ ਪਲੇਟਫਾਰਮ",
+    "headline": "BIS ਪਾਲਣਾ ਨੂੰ ਸਰਲ ਬਣਾਉਣਾ",
+    "subheading": "ਸਾਡੇ AI-ਸੰਚਾਲਿਤ ਪਲੇਟਫਾਰਮ ਦੇ ਨਾਲ ਭਾਰਤੀ ਮਿਆਰਾਂ, QCOs, ਅਤੇ ਪ੍ਰਮਾਣੀਕਰਣ ਦੇ ਗੁੰਝਲਦਾਰ ਲੈਂਡਸਕੇਪ ਨੂੰ ਆਸਾਨੀ ਨਾਲ ਨੈਵੀਗੇਟ ਕਰੋ।",
+    "cta_standards": "ਮਿਆਰਾਂ ਦੀ ਪੜਚੋਲ ਕਰੋ",
+    "cta_ai": "AI ਸਾਥੀ ਨੂੰ ਪੁੱਛੋ"
+  },
+  "search": {
+    "placeholder": "ਮਿਆਰ, ਉਤਪਾਦ, QCOs, ਪ੍ਰਯੋਗਸ਼ਾਲਾਵਾਂ ਖੋਜੋ...",
+    "btn": "ਖੋਜੋ",
+    "popular": "ਪ੍ਰਸਿੱਧ:"
+  },
+  "discover": {
+    "overline": "ਉਤਪਾਦ ਲਾਗੂ ਹੋਣਾ",
+    "title": "ਲਾਗੂ ਮਿਆਰ ਲੱਭੋ",
+    "subtitle": "ਰੈਗੂਲੇਟਰੀ ਫਤਵਿਆਂ ਨੂੰ ਤੁਰੰਤ ਹੱਲ ਕਰਨ ਲਈ ਆਪਣੀ ਉਤਪਾਦ ਸ਼੍ਰੇਣੀ, ਵਾਤਾਵਰਣ ਅਤੇ ਮਾਪਦੰਡ ਚੁਣੋ।",
+    "step1": "ਸ਼੍ਰੇਣੀ",
+    "step2": "ਵਾਤਾਵਰਣ",
+    "step3": "ਮਾਪਦੰਡ",
+    "required": "ਲੋੜੀਂਦਾ",
+    "resolution_title": "ਵਿਧਾਨਿਕ ਮਤਾ",
+    "resolution_label": "ਲਾਈਵ",
+    "resolved_mandate": "ਹੱਲ ਕੀਤਾ ਫਤਵਾ",
+    "launch": "ਡਿਸਕਵਰੀ ਲਾਂਚ ਕਰੋ"
+  },
+  "standards": {
+    "filter_all": "ਸਾਰੇ",
+    "filter_mandatory": "ਲਾਜ਼ਮੀ",
+    "filter_electro": "ਇਲੈਕਟ੍ਰੋ",
+    "filter_mechanical": "ਮਕੈਨੀਕਲ",
+    "filter_civil": "ਸਿਵਲ",
+    "identifier": "ਪਛਾਣਕਰਤਾ",
+    "title_col": "ਸਿਰਲੇਖ",
+    "division": "ਵਿਭਾਗ",
+    "legal_status": "ਕਾਨੂੰਨੀ ਸਥਿਤੀ",
+    "lab_network": "ਲੈਬ ਨੈੱਟਵਰਕ",
+    "actions": "ਕਾਰਵਾਈਆਂ",
+    "view_scope": "ਸਕੋਪ ਦੇਖੋ"
+  }
+}

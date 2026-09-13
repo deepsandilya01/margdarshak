@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "தரநிலைகள், தயாரிப்புகள், QCO, ஆய்வகங்களைத் தேடுங்கள்...",
+    "language": "மொழி",
+    "login": "உள்நுழைக"
+  },
+  "nav": {
+    "standards": "தரநிலை எக்ஸ்ப்ளோரர்",
+    "products": "தயாரிப்புகள்",
+    "qcos": "QCO",
+    "laboratories": "ஆய்வகக் கண்டுபிடிப்பான்",
+    "certification": "சான்றிதழ்",
+    "hallmarking": "ஹால்மார்க்கிங்",
+    "aiSathi": "AI சாதி",
+    "consumer_help": "நுகர்வோர் உதவி",
+    "resources": "வளங்கள்"
+  },
+  "footer": {
+    "quickLinks": "விரைவான இணைப்புகள்",
+    "about": "BIS பற்றி",
+    "contact": "எங்களை தொடர்பு கொள்ள",
+    "help": "உதவி & ஆதரவு"
+  }
+}

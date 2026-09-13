@@ -1,6 +1,6 @@
 import React from 'react';
-import { useLanguage } from '../../hooks/useLanguage';
-import { EmptyState } from '../../components/shared/EmptyState';
+import { useLanguage } from '@/hooks/useLanguage';
+import { EmptyState } from '@/components/feedback/EmptyState';
 import { motion } from 'framer-motion';
 
 export default function Notifications() {

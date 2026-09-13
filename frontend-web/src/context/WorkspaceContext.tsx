@@ -38,11 +38,30 @@ interface WorkspaceContextValue {
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
 const MAX_COMPARISON = 4;
+const COMPARISON_STORAGE_KEY = 'bis-sathi-comparison-items';
+const SAVED_STORAGE_KEY = 'bis-sathi-saved-items';
+
+function readStorage<T>(key: string, fallback: T): T {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
-  const [comparisonItems, setComparisonItems] = useState<ComparisonItem[]>([]);
+  const [comparisonItems, setComparisonItems] = useState<ComparisonItem[]>(() => readStorage(COMPARISON_STORAGE_KEY, []));
   const [isTrayOpen, setTrayOpen] = useState(false);
-  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>(() => readStorage(SAVED_STORAGE_KEY, []));
+
+  React.useEffect(() => {
+    localStorage.setItem(COMPARISON_STORAGE_KEY, JSON.stringify(comparisonItems));
+  }, [comparisonItems]);
+
+  React.useEffect(() => {
+    localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(savedItems));
+  }, [savedItems]);
 
   const addToComparison = useCallback((item: ComparisonItem): boolean => {
     if (comparisonItems.length >= MAX_COMPARISON) return false;

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
+import { useLanguage } from '@/hooks/useLanguage';
 import { motion } from 'framer-motion';
+import { signIn } from '@/features/auth/services/authService';
 
 export default function Login() {
   const { t } = useLanguage();
@@ -9,13 +10,21 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     setTimeout(() => {
-      setLoading(false);
-      navigate('/workspace');
+      try {
+        signIn(email, password);
+        navigate('/workspace');
+      } catch (submitError) {
+        setError((submitError as Error).message);
+      } finally {
+        setLoading(false);
+      }
     }, 1000);
   };
 
@@ -35,6 +44,7 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-[13px] text-on-error-container">{error}</p>}
           <div className="space-y-1.5">
             <label className="text-[13px] font-semibold text-on-surface">{t('auth.email')}</label>
             <input

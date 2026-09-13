@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLanguage } from '../../hooks/useLanguage';
+import { useLanguage } from '@/hooks/useLanguage';
 import { motion } from 'framer-motion';
 
 export default function About() {

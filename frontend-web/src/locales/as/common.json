@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "মান, সামগ্ৰী, QCO, পৰীক্ষাগাৰ বিচাৰক...",
+    "language": "ভাষা",
+    "login": "লগইন কৰক"
+  },
+  "nav": {
+    "standards": "ষ্টেণ্ডাৰ্ডছ এক্সপ্ল'ৰাৰ",
+    "products": "সামগ্ৰী",
+    "qcos": "QCO",
+    "laboratories": "লেবৰেটৰী ফাইণ্ডাৰ",
+    "certification": "প্ৰমাণপত্ৰ",
+    "hallmarking": "হলমাৰ্কিং",
+    "aiSathi": "AI সাৰথী",
+    "consumer_help": "গ্ৰাহক সহায়",
+    "resources": "সমল"
+  },
+  "footer": {
+    "quickLinks": "দ্ৰুত লিংক",
+    "about": "BIS ৰ বিষয়ে",
+    "contact": "আমাৰ সৈতে যোগাযোগ কৰক",
+    "help": "সহায় আৰু সমৰ্থন"
+  }
+}

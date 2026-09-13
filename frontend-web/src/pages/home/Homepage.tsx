@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
-import { useStandards } from '../../hooks/useStandards';
-import { StatusPill, TechIdentifier } from '../../components/shared/StatusPill';
+import { useT as useTranslation } from '@/hooks/useTranslation';
+import { useStandards } from '@/features/standards/hooks/useStandards';
+import { StatusPill, TechIdentifier } from '@/components/feedback/StatusPill';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -11,16 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 /** BIS-SATHI Flagship Homepage — faithfully implements Stitch screen 5cecde37... */
 
-const STATUTORY_PIPELINE = [
-  { node: 'NODE 01', icon: 'inventory_2', label: 'Input Product', value: 'Li-Ion Pack', sub: 'Class M1/N1', accent: 'var(--primary)' },
-  { node: 'NODE 02', icon: 'menu_book', label: 'Standard Ref', value: 'IS 16046-2', sub: 'Edition 2018', accent: 'var(--secondary)' },
-  { node: 'NODE 03', icon: 'rule', label: 'Applicability', value: 'Mandatory', sub: '100% Commercial', accent: 'var(--primary)' },
-  { node: 'NODE 04', icon: 'gavel', label: 'QCO Order', value: 'MeitY CRO', sub: 'Phase V Mandate', accent: 'var(--secondary)' },
-  { node: 'NODE 05', icon: 'biotech', label: 'Testing Scope', value: '12 Protocols', sub: 'Thermal & Overcharge', accent: 'var(--primary)' },
-  { node: 'NODE 06', icon: 'science', label: 'NABL Labs', value: '14 Centers', sub: 'Active Queue < 21d', accent: 'var(--secondary)' },
-  { node: 'NODE 07', icon: 'badge', label: 'Certification', value: 'CRS Registration', sub: 'Scheme II BIS', accent: 'var(--primary)' },
-  { node: 'OUTPUT', icon: 'verified', label: 'Audit Dossier', value: 'Conforming', sub: 'Gazette Trace Valid', accent: null, isOutput: true },
-];
+
 
 const CATEGORIES = [
   { icon: 'devices', label: 'Consumer Electronics', key: 'Electronics & IT' },
@@ -45,7 +36,7 @@ const FEATURE_CARDS = [
 ];
 
 export default function Homepage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation(['home', 'common']);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>('Electronics & IT');
@@ -149,19 +140,19 @@ export default function Homepage() {
             <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container text-primary text-[11px] font-semibold uppercase tracking-widest w-fit border border-outline-variant/30">
               <span className="w-2 h-2 rounded-full bg-secondary animate-pulse-dot" />
               <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>
-              <span>{t('home.hero.overline')}</span>
+              <span>{t('hero.overline')}</span>
             </div>
 
             {/* H1 — Headline */}
             <h1 className="hero-headline text-hero font-serif-hero text-on-surface tracking-tight">
-              {t('home.hero.headline')}
+              {t('hero.headline')}
             </h1>
 
             <div className="h-1.5 tricolor-bar max-w-sm mb-2" />
 
             {/* Subheading */}
             <p className="hero-subheading text-body-fluid text-on-surface-variant max-w-2xl">
-              {t('home.hero.subheading')}
+              {t('hero.subheading')}
             </p>
 
             {/* CTAs */}
@@ -170,7 +161,7 @@ export default function Homepage() {
                 to="/standards"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-on-primary text-[16px] font-semibold hover:brightness-110 transition-all shadow-md"
               >
-                <span>{t('home.hero.cta_standards')}</span>
+                <span>{t('hero.cta_standards')}</span>
                 <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </Link>
               <Link
@@ -178,7 +169,7 @@ export default function Homepage() {
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-surface-container-lowest text-primary text-[16px] font-semibold hover:bg-surface-container-low transition-all shadow-sm border border-outline-variant"
               >
                 <span className="material-symbols-outlined text-secondary text-[20px]">auto_awesome</span>
-                <span>{t('home.hero.cta_ai')}</span>
+                <span>{t('hero.cta_ai')}</span>
               </Link>
             </div>
 
@@ -297,8 +288,8 @@ export default function Homepage() {
           </div>
 
           {/* Horizontal stepper pipeline */}
-          <div className="journey-container bg-surface rounded-2xl border border-outline-variant/30 shadow-sm px-4 py-4">
-            <div className="flex items-start w-full">
+          <div className="journey-container bg-surface rounded-2xl border border-outline-variant/30 shadow-sm px-4 py-4 overflow-x-auto">
+            <div className="flex items-start w-max min-w-full pb-2 md:pb-0">
 
               {/* NODE 01 */}
               <div className="journey-node flex flex-col items-center gap-2 flex-1 min-w-0">
@@ -585,7 +576,7 @@ export default function Homepage() {
                   ['Applicable Test Protocols:', '4 Clauses Triggered'],
                   ['Testing Window:', '15-28 Calendar Days'],
                 ].map(([key, val]) => (
-                  <div key={key} className="flex items-center justify-between font-mono text-[12px]">
+                  <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between font-mono text-[12px] gap-1 sm:gap-0">
                     <span className="text-white/50">{key}</span>
                     <span className="text-white font-bold">{val}</span>
                   </div>
@@ -803,7 +794,7 @@ export default function Homepage() {
       {/* ════════════════════════════════════════
           SECTION 5 — FEATURE CAPABILITY GRID
       ════════════════════════════════════════ */}
-      <section className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-10 md:py-16 lg:py-24">
+      <section className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-10 pb-16 md:pt-16 md:pb-24 lg:pt-24 lg:pb-32">
         <div className="flex flex-col gap-2 max-w-2xl mb-4">
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-secondary">
             <span className="material-symbols-outlined text-[15px]">apps</span>
@@ -843,7 +834,7 @@ export default function Homepage() {
       {/* ════════════════════════════════════════
           SECTION 6 — AI SATHI PROMO
       ════════════════════════════════════════ */}
-      <section className="w-full pt-3 pb-10 md:pt-8 md:pb-16 lg:pt-12 lg:pb-24" style={{ background: '#17161A' }}>
+      <section className="w-full pt-12 pb-12 md:pt-16 md:pb-16 lg:pt-20 lg:pb-24" style={{ background: '#17161A' }}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 flex flex-col lg:flex-row items-center justify-between gap-8">
           <div className="flex flex-col gap-4 max-w-xl">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-white/50">

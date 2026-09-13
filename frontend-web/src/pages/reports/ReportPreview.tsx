@@ -1,19 +1,23 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TranslatingText } from '../../components/shared/TranslatingText';
-import { TechIdentifier } from '../../components/shared/StatusPill';
-import { EvidenceBadge } from '../../components/shared/EvidenceBadge';
-import mockReports from '../../data/reports.json';
-import type { Report } from '../../types/report';
+import { TranslatingText } from '@/components/common/TranslatingText';
+import { TechIdentifier } from '@/components/feedback/StatusPill';
+import { EvidenceBadge } from '@/features/evidence/components/EvidenceBadge';
+import mockReports from '@/data/reports/reports.json';
+import type { Report } from '@/features/reports/types/report';
 
 export default function ReportPreview() {
   const { id } = useParams<{ id: string }>();
-  const report = (mockReports as Report[]).find(r => r.id === id) || mockReports[0];
+  const report = (mockReports as Report[]).find(r => r.id === id);
 
   const handlePrint = () => {
     window.print();
   };
+
+  if (!report) {
+    return <div className="mx-auto max-w-2xl px-6 py-20 text-center"><h1 className="text-headline-lg text-on-surface">Report not found</h1><Link to="/reports" className="mt-6 inline-flex rounded-lg bg-primary px-4 py-2 text-white">Back to Reports</Link></div>;
+  }
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 bg-bg-base min-h-[calc(100vh-64px)]">

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TranslatingText } from '../../components/shared/TranslatingText';
-import { formatDate } from '../../lib/formatDate';
-import mockResources from '../../data/resources.json';
-import type { Resource } from '../../types/resource';
+import { TranslatingText } from '@/components/common/TranslatingText';
+import { formatDate } from '@/utils/formatDate';
+import mockResources from '@/data/resources/resources.json';
+import type { Resource } from '@/features/resources/types/resource';
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();

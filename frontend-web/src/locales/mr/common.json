@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "मानके, उत्पाद, QCO, प्रयोगशाळा शोधा...",
+    "language": "भाषा",
+    "login": "लॉग इन करा"
+  },
+  "nav": {
+    "standards": "मानक एक्सप्लोरर",
+    "products": "उत्पादने",
+    "qcos": "QCO",
+    "laboratories": "प्रयोगशाळा शोधक",
+    "certification": "प्रमाणपत्र",
+    "hallmarking": "हॉलमार्किंग",
+    "aiSathi": "AI साथी",
+    "consumer_help": "ग्राहक मदत",
+    "resources": "संसाधने"
+  },
+  "footer": {
+    "quickLinks": "त्वरित दुवे",
+    "about": "BIS बद्दल",
+    "contact": "आमच्याशी संपर्क साधा",
+    "help": "मदत आणि समर्थन"
+  }
+}

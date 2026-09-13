@@ -1,29 +1,23 @@
+/**
+ * Global Language Context — single source of truth for language state.
+ * Syncs react-i18next language with localStorage and provides
+ * the useDynamicTranslation hook for runtime Lingva translation.
+ */
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { translations, type TranslationKey } from '../data/translations';
-import { translateText } from '../lib/translate';
+import { useT as useTranslation } from '@/hooks/useTranslation';
+import i18n from '@/i18n';
+import { LANGUAGES, type LanguageCode } from '@/core/apiConfig';
+import { translateText } from '@/services/translation/translationService';
 
-export const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English', native: 'English' },
-  { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
-  { code: 'mr', name: 'Marathi', native: 'मराठी' },
-  { code: 'bn', name: 'Bengali', native: 'বাংলা' },
-  { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-  { code: 'te', name: 'Telugu', native: 'తెలుగు' },
-  { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
-  { code: 'gu', name: 'Gujarati', native: 'ગુજરાતી' },
-  { code: 'ml', name: 'Malayalam', native: 'മലയാളം' },
-  { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
-  { code: 'or', name: 'Odia', native: 'ଓଡ଼ିଆ' },
-  { code: 'as', name: 'Assamese', native: 'অসমীয়া' },
-] as const;
-
-export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
+// Re-export for backward compatibility with components that import from here
+export { LANGUAGES as SUPPORTED_LANGUAGES };
+export type { LanguageCode };
 
 interface LanguageContextValue {
   language: LanguageCode;
   setLanguage: (lang: LanguageCode) => void;
-  /** Translates static pre-defined UI keys */
-  t: (key: TranslationKey) => string;
+  /** Translates a string using the full priority chain */
+  translate: (text: string) => Promise<string>;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -31,29 +25,44 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>(() => {
     const stored = localStorage.getItem('bis-sathi-lang');
-    return (stored as LanguageCode) || 'en';
+    return LANGUAGES.some(item => item.code === stored) ? stored as LanguageCode : 'en';
   });
+
+  // Ensure i18next stays in sync with our language state
+  useEffect(() => {
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language]);
+
+  // Listen for i18next language changes (from Header or other sources)
+  useEffect(() => {
+    const handler = (lng: string) => {
+      if (LANGUAGES.some(item => item.code === lng) && lng !== language) {
+        setLanguageState(lng as LanguageCode);
+        localStorage.setItem('bis-sathi-lang', lng);
+      }
+    };
+    i18n.on('languageChanged', handler);
+    return () => i18n.off('languageChanged', handler);
+  }, [language]);
 
   const setLanguage = useCallback((lang: LanguageCode) => {
     setLanguageState(lang);
     localStorage.setItem('bis-sathi-lang', lang);
+    i18n.changeLanguage(lang);
   }, []);
 
-  const t = useCallback(
-    (key: TranslationKey): string => {
-      // If we have manual translations (en/hi), use them first.
-      const langDict = translations[language as keyof typeof translations];
-      if (langDict && (langDict as any)[key]) {
-        return (langDict as any)[key];
-      }
-      // Fallback to English if translation missing for the current language
-      return translations.en[key] ?? key;
+  const translate = useCallback(
+    async (text: string) => {
+      if (!text || language === 'en') return text;
+      return translateText(text, language, 'en');
     },
     [language]
   );
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, translate }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -66,34 +75,34 @@ export function useLanguageContext(): LanguageContextValue {
 }
 
 /**
- * Hook to translate dynamic content on the fly.
- * Automatically respects the current language context.
+ * useDynamicTranslation — translates a single string reactively.
+ * Shows English immediately, updates to translated text once resolved.
+ * Falls back to English on failure — NEVER to Hindi.
  */
 export function useDynamicTranslation(text: string | null | undefined): string {
   const { language } = useLanguageContext();
   const [translated, setTranslated] = useState<string>(text || '');
 
   useEffect(() => {
-    if (!text) {
-      setTranslated('');
-      return;
-    }
-    
-    // For English or empty text, just set it directly.
-    if (language === 'en') {
-      setTranslated(text);
-      return;
-    }
+    if (!text) { setTranslated(''); return; }
+    if (language === 'en') { setTranslated(text); return; }
 
-    let isMounted = true;
-    // Note: We could show a skeleton/loading state here, but returning the original text 
-    // while loading is a smoother experience than flashing a skeleton for text changes.
-    translateText(text, language).then(res => {
-      if (isMounted) setTranslated(res);
+    let active = true;
+    translateText(text, language, 'en').then(result => {
+      if (active) setTranslated(result);
     });
 
-    return () => { isMounted = false; };
+    return () => { active = false; };
   }, [text, language]);
 
   return translated;
+}
+
+/**
+ * Legacy hook alias — kept for backward compat
+ */
+export function useLanguage() {
+  const { language, setLanguage } = useLanguageContext();
+  const { t } = useTranslation(['common', 'home', 'aiSathi']);
+  return { language, setLanguage, t };
 }

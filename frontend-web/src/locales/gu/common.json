@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "ધોરણો, ઉત્પાદનો, QCO, પ્રયોગશાળાઓ શોધો...",
+    "language": "ભાષા",
+    "login": "લોગિન કરો"
+  },
+  "nav": {
+    "standards": "સ્ટાન્ડર્ડ્સ એક્સપ્લોરર",
+    "products": "ઉત્પાદનો",
+    "qcos": "QCO",
+    "laboratories": "લેબોરેટરી ફાઇન્ડર",
+    "certification": "પ્રમાણપત્ર",
+    "hallmarking": "હોલમાર્કિંગ",
+    "aiSathi": "AI સાથી",
+    "consumer_help": "ગ્રાહક સહાય",
+    "resources": "સંસાધનો"
+  },
+  "footer": {
+    "quickLinks": "ઝડપી લિંક્સ",
+    "about": "BIS વિશે",
+    "contact": "અમારો સંપર્ક કરો",
+    "help": "મદદ અને આધાર"
+  }
+}

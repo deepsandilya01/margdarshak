@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useStandards } from '../../hooks/useStandards';
-import { useLanguage } from '../../hooks/useLanguage';
-import { useWorkspace } from '../../context/WorkspaceContext';
-import { StatusPill, TechIdentifier } from '../../components/shared/StatusPill';
-import { EvidenceBadge, EvidenceDrawer } from '../../components/shared/EvidenceBadge';
-import { StandardsTableSkeleton } from '../../components/shared/Skeleton';
-import { EmptyState } from '../../components/shared/EmptyState';
-import type { Standard } from '../../hooks/useStandards';
+import { useStandards } from '@/features/standards/hooks/useStandards';
+import { useLanguage } from '@/hooks/useLanguage';
+import { useWorkspace } from '@/context/WorkspaceContext';
+import { StatusPill, TechIdentifier } from '@/components/feedback/StatusPill';
+import { EvidenceBadge, EvidenceDrawer } from '@/features/evidence/components/EvidenceBadge';
+import { StandardsTableSkeleton } from '@/components/shared/Skeleton';
+import { EmptyState } from '@/components/feedback/EmptyState';
+import type { Standard } from '@/features/standards/hooks/useStandards';
 
 type FilterStatus = 'all' | 'mandatory_qco' | 'active' | 'superseded' | 'under_revision';
 

@@ -1,13 +1,102 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
-import { SUPPORTED_LANGUAGES, type LanguageCode } from '../../context/LanguageContext';
-import { useWorkspace } from '../../context/WorkspaceContext';
-import { useTheme } from '../../context/ThemeContext';
-import SearchOverlay from '../search/SearchOverlay';
+import { useT as useTranslation } from '@/hooks/useTranslation';
+import { useWorkspace } from '@/context/WorkspaceContext';
+import { useTheme } from '@/context/ThemeContext';
+import { useLanguageContext } from '@/context/LanguageContext';
+import { LANGUAGES, type LanguageCode } from '@/core/apiConfig';
+import SearchOverlay from '@/components/overlays/search/SearchOverlay';
+import { TranslatingText } from '@/components/common/TranslatingText';
+
+// Alias to LANGUAGES from apiConfig for backward compat with other imports
+export const SUPPORTED_LANGUAGES = LANGUAGES;
+
+// ─── Extracted sub-components (must be outside Header to avoid re-creation) ──
+
+interface ThemeSwitcherProps {
+  theme: string;
+  setTheme: (t: 'light' | 'dark' | 'system') => void;
+  dropdownRef: React.RefObject<HTMLDivElement | null>;
+}
+
+function ThemeSwitcher({ theme, setTheme, dropdownRef }: ThemeSwitcherProps) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex h-10 w-10 items-center justify-center rounded-xl border border-outline-variant/50 bg-surface-container-low text-on-surface-variant transition-colors hover:border-primary/30 hover:bg-surface-container hover:text-on-surface"
+        aria-label="Theme Settings"
+      >
+        <span className="material-symbols-outlined text-[20px]">
+          {theme === 'light' ? 'light_mode' : theme === 'dark' ? 'dark_mode' : 'contrast'}
+        </span>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-36 overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-lowest py-1 shadow-[0_16px_32px_rgba(15,23,42,0.08)] z-[60]">
+          {(['light', 'dark', 'system'] as const).map(opt => (
+            <button
+              key={opt}
+              onClick={() => { setTheme(opt); setOpen(false); }}
+              className={`flex w-full items-center justify-between px-4 py-2 text-left text-[13px] font-medium transition-colors ${theme === opt ? 'bg-surface-container-low text-primary' : 'text-on-surface hover:bg-surface-container-low'}`}
+            >
+              <span className="capitalize">{opt}</span>
+              {theme === opt && <span className="material-symbols-outlined text-[16px]">check</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface LangSwitcherProps {
+  currentLang: typeof LANGUAGES[number];
+  currentCode: string;
+  setLanguage: (lang: LanguageCode) => void;
+  dropdownRef: React.RefObject<HTMLDivElement | null>;
+}
+
+function LangSwitcher({ currentLang, currentCode, setLanguage, dropdownRef }: LangSwitcherProps) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-2 rounded-xl border border-outline-variant/50 bg-surface-container-low px-3 py-2 text-on-surface-variant transition-colors hover:border-primary/30 hover:bg-surface-container hover:text-on-surface"
+        aria-label={`Language: ${currentLang.nativeName}`}
+      >
+        <span className="material-symbols-outlined text-[18px]">translate</span>
+        <div className="flex flex-col items-start leading-none gap-0.5">
+          <span className="text-[12px] font-bold text-on-surface leading-none">{currentLang.nativeName}</span>
+        </div>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-48 max-h-[60vh] overflow-y-auto rounded-xl border border-outline-variant/40 bg-surface-container-lowest py-2 shadow-[0_16px_32px_rgba(15,23,42,0.12)] z-[60]">
+          {LANGUAGES.map(lang => (
+            <button
+              key={lang.code}
+              onClick={() => { setLanguage(lang.code); setOpen(false); }}
+              className={`flex w-full items-center justify-between px-4 py-2 text-left transition-colors ${currentCode === lang.code ? 'bg-surface-container-low border-l-2 border-primary' : 'border-l-2 border-transparent text-on-surface hover:bg-surface-container-low'}`}
+            >
+              <div className="flex flex-col gap-0.5">
+                <span className={`text-[14px] font-semibold ${currentCode === lang.code ? 'text-primary' : 'text-on-surface'}`}>{lang.nativeName}</span>
+                <span className="text-[11px] text-on-surface-variant">{lang.englishName}</span>
+              </div>
+              {currentCode === lang.code && <span className="material-symbols-outlined text-[18px] text-primary">check</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Header ──────────────────────────────────────────────────────────────
 
 export default function Header() {
-  const { t, language, setLanguage } = useLanguage();
+  const { t, i18n } = useTranslation(['common']);
+  const { setLanguage } = useLanguageContext();
   const { savedItems } = useWorkspace();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
@@ -23,31 +112,26 @@ export default function Header() {
 
   // Close mobile menu on route change
   useEffect(() => {
-    setMobileMenuOpen(false);
+    if (mobileMenuOpen) setMobileMenuOpen(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   // Prevent scroll when mobile menu is open
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
 
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const langDropdownRef = useRef<HTMLDivElement>(null);
-  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const themeDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (langDropdownRef.current && !langDropdownRef.current.contains(e.target as Node)) {
-        setLangDropdownOpen(false);
+        // LangSwitcher manages its own open state
       }
       if (themeDropdownRef.current && !themeDropdownRef.current.contains(e.target as Node)) {
-        setThemeDropdownOpen(false);
+        // ThemeSwitcher manages its own open state
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -70,7 +154,7 @@ export default function Header() {
     { key: 'nav.laboratories', path: '/laboratories', icon: 'science' },
     { key: 'nav.certification', path: '/certification', icon: 'verified' },
     { key: 'nav.hallmarking', path: '/hallmarking', icon: 'diamond' },
-    { key: 'nav.ai_sathi', path: '/ai-sathi', icon: 'auto_awesome' },
+    { key: 'nav.aiSathi', path: '/ai-sathi', icon: 'auto_awesome' },
     { key: 'nav.consumer_help', path: '/help', icon: 'support_agent' },
     { key: 'nav.resources', path: '/resources', icon: 'library_books' },
   ] as const;
@@ -80,65 +164,7 @@ export default function Header() {
     [location.pathname]
   );
 
-  const currentLang = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];
-
-  const ThemeSwitcher = ({ compact = false }: { compact?: boolean }) => (
-    <div className="relative" ref={compact ? undefined : themeDropdownRef}>
-      <button
-        onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-        className={`flex items-center justify-center rounded-xl border border-outline-variant/50 bg-surface-container-low text-on-surface-variant transition-colors hover:border-primary/30 hover:bg-surface-container hover:text-on-surface ${compact ? 'h-10 w-10' : 'h-10 w-10'}`}
-        aria-label="Theme Settings"
-      >
-        <span className="material-symbols-outlined text-[20px]">
-          {theme === 'light' ? 'light_mode' : theme === 'dark' ? 'dark_mode' : 'contrast'}
-        </span>
-      </button>
-      {themeDropdownOpen && (
-        <div className="absolute right-0 top-full mt-2 w-36 overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-lowest py-1 shadow-[0_16px_32px_rgba(15,23,42,0.08)] z-[60]">
-          {(['light', 'dark', 'system'] as const).map(opt => (
-            <button
-              key={opt}
-              onClick={() => { setTheme(opt); setThemeDropdownOpen(false); }}
-              className={`flex w-full items-center justify-between px-4 py-2 text-left text-[13px] font-medium transition-colors ${theme === opt ? 'bg-surface-container-low text-primary' : 'text-on-surface hover:bg-surface-container-low'}`}
-            >
-              <span className="capitalize">{opt}</span>
-              {theme === opt && <span className="material-symbols-outlined text-[16px]">check</span>}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  const LangSwitcher = ({ compact = false }: { compact?: boolean }) => (
-    <div className="relative" ref={compact ? undefined : langDropdownRef}>
-      <button
-        onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-        className="flex items-center gap-1.5 rounded-xl border border-outline-variant/50 bg-surface-container-low px-2.5 py-2 text-on-surface-variant transition-colors hover:border-primary/30 hover:bg-surface-container hover:text-on-surface"
-        aria-label={`Language: ${currentLang.native}`}
-      >
-        <span className="material-symbols-outlined text-[16px]">translate</span>
-        <span className="text-[12px] font-semibold">{currentLang.code.toUpperCase()}</span>
-      </button>
-      {langDropdownOpen && (
-        <div className="absolute right-0 top-full mt-2 w-48 max-h-80 overflow-y-auto rounded-xl border border-outline-variant/40 bg-surface-container-lowest py-1 shadow-[0_16px_32px_rgba(15,23,42,0.08)] z-[60]">
-          <div className="mb-1 border-b border-outline-variant/40 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-on-surface-variant">
-            Select Language
-          </div>
-          {SUPPORTED_LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              onClick={() => { setLanguage(lang.code); setLangDropdownOpen(false); }}
-              className={`flex w-full flex-col px-4 py-2 text-left text-[13px] transition-colors ${language === lang.code ? 'bg-surface-container text-primary' : 'text-on-surface hover:bg-surface-container-low'}`}
-            >
-              <span className="font-semibold">{lang.native}</span>
-              <span className="text-[11px] text-on-surface-variant">{lang.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
 
   return (
     <>
@@ -167,6 +193,7 @@ export default function Header() {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-colors ${
                   isActive(item.path)
                     ? 'bg-primary text-on-primary'
@@ -174,33 +201,33 @@ export default function Header() {
                 }`}
               >
                 <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                <span>{t(item.key)}</span>
+                <span>{t(item.key, { defaultValue: item.key.split('.')[1] })}</span>
               </Link>
             ))}
             <div className="pt-2 border-t border-outline-variant/30 mt-2 space-y-1">
-              <Link to="/workspace" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
+              <Link to="/workspace" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
                 <span className="material-symbols-outlined text-[20px]">space_dashboard</span>
-                <span>Compliance Workspace</span>
+                <TranslatingText text="Compliance Workspace" />
               </Link>
-              <Link to="/saved" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
+              <Link to="/saved" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
                 <span className="material-symbols-outlined text-[20px]">bookmark</span>
-                <span>Saved Items {savedItems.length > 0 ? `(${savedItems.length})` : ''}</span>
+                <TranslatingText text={`Saved Items ${savedItems.length > 0 ? `(${savedItems.length})` : ''}`} />
               </Link>
-              <Link to="/history" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
+              <Link to="/history" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
                 <span className="material-symbols-outlined text-[20px]">history</span>
-                <span>Research History</span>
+                <TranslatingText text="Research History" />
               </Link>
-              <Link to="/reports" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
+              <Link to="/reports" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
                 <span className="material-symbols-outlined text-[20px]">description</span>
-                <span>Reports</span>
+                <TranslatingText text="Reports" />
               </Link>
-              <Link to="/profile" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
+              <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
                 <span className="material-symbols-outlined text-[20px]">person</span>
-                <span>Profile</span>
+                <TranslatingText text="Profile" />
               </Link>
-              <Link to="/settings" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
+              <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-on-surface hover:bg-surface-container-low">
                 <span className="material-symbols-outlined text-[20px]">settings</span>
-                <span>Settings</span>
+                <TranslatingText text="Settings" />
               </Link>
             </div>
           </nav>
@@ -208,7 +235,7 @@ export default function Header() {
           {/* Language + Theme controls */}
           <div className="px-4 py-4 border-t border-outline-variant/30 flex flex-col gap-4">
             <div>
-              <p className="text-[11px] text-on-surface-variant mb-2 uppercase tracking-widest font-semibold">Theme</p>
+              <p className="text-[11px] text-on-surface-variant mb-2 uppercase tracking-widest font-semibold"><TranslatingText text="Theme" /></p>
               <div className="flex gap-2">
                 {(['light', 'dark', 'system'] as const).map(opt => (
                   <button
@@ -229,19 +256,20 @@ export default function Header() {
               </div>
             </div>
             <div>
-              <p className="text-[11px] text-on-surface-variant mb-2 uppercase tracking-widest font-semibold">Language</p>
-              <div className="flex flex-wrap gap-1.5">
-                {SUPPORTED_LANGUAGES.map(lang => (
+              <p className="text-[11px] text-on-surface-variant mb-2 uppercase tracking-widest font-semibold">{t('header.language', { defaultValue: 'Language' })}</p>
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGES.map(lang => (
                   <button
                     key={lang.code}
                     onClick={() => setLanguage(lang.code)}
-                    className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors ${
-                      language === lang.code
-                        ? 'bg-primary text-on-primary'
-                        : 'bg-surface-container text-on-surface hover:bg-surface-container-high'
+                    className={`flex flex-col items-start px-3 py-2 rounded-xl text-[13px] font-medium transition-colors border ${
+                      i18n.language === lang.code
+                        ? 'bg-primary/10 text-primary border-primary/30'
+                        : 'bg-surface-container text-on-surface border-outline-variant/40 hover:bg-surface-container-high'
                     }`}
                   >
-                    {lang.native}
+                    <span className="font-bold text-[14px]">{lang.nativeName}</span>
+                    <span className="text-[10px] opacity-80 font-normal">{lang.englishName}</span>
                   </button>
                 ))}
               </div>
@@ -250,11 +278,11 @@ export default function Header() {
 
           {/* Auth links */}
           <div className="px-4 pb-6 flex gap-3">
-            <Link to="/login" className="flex-1 text-center py-2.5 rounded-xl border border-outline-variant/50 text-[14px] font-medium text-on-surface hover:bg-surface-container-low transition-colors">
-              Sign In
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="flex-1 text-center py-2.5 rounded-xl border border-outline-variant/50 text-[14px] font-medium text-on-surface hover:bg-surface-container-low transition-colors">
+              {t('header.login', { defaultValue: 'Login' })}
             </Link>
-            <Link to="/signup" className="flex-1 text-center py-2.5 rounded-xl bg-primary text-on-primary text-[14px] font-medium hover:brightness-110 transition-colors">
-              Sign Up
+            <Link to="/signup" onClick={() => setMobileMenuOpen(false)} className="flex-1 text-center py-2.5 rounded-xl bg-primary text-on-primary text-[14px] font-medium hover:brightness-110 transition-colors">
+              <TranslatingText text="Sign Up" />
             </Link>
           </div>
         </div>
@@ -284,11 +312,11 @@ export default function Header() {
           {/* Search bar (desktop only) */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="hidden xl:flex items-center gap-2 rounded-xl border border-outline-variant/60 bg-surface-container-low/80 px-3 py-2.5 text-left shadow-[0_6px_18px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-primary/40 hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 w-64 shrink-0"
+            className="hidden xl:flex items-center gap-2 rounded-xl border border-outline-variant/60 bg-surface-container-low/80 px-3 py-2.5 text-left shadow-[0_6px_18px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-primary/40 hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 w-64 lg:w-80 shrink-0"
             aria-label="Open search (Ctrl+K)"
           >
             <span className="material-symbols-outlined text-[18px] text-on-surface-variant shrink-0 w-[18px] h-[18px] flex items-center justify-center">search</span>
-            <span className="flex-1 text-[13px] text-on-surface-variant truncate">Search standards, QCOs...</span>
+            <span className="flex-1 text-[13px] text-on-surface-variant truncate">{t('header.searchPlaceholder', { defaultValue: 'Search...' })}</span>
             <kbd className="rounded-md border border-outline-variant/70 bg-surface-container px-1.5 py-0.5 font-mono text-[10px] text-on-surface-variant shrink-0">⌘K</kbd>
           </button>
 
@@ -296,12 +324,17 @@ export default function Header() {
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {/* Theme switcher — desktop */}
             <div className="hidden lg:block">
-              <ThemeSwitcher />
+              <ThemeSwitcher theme={theme} setTheme={setTheme} dropdownRef={themeDropdownRef} />
             </div>
 
             {/* Language switcher — desktop */}
             <div className="hidden lg:block">
-              <LangSwitcher />
+              <LangSwitcher
+                currentLang={currentLang}
+                currentCode={i18n.language}
+                setLanguage={setLanguage}
+                dropdownRef={langDropdownRef}
+              />
             </div>
 
             {/* Search icon — mobile/tablet */}
@@ -333,7 +366,7 @@ export default function Header() {
               className="hidden lg:flex items-center gap-1.5 rounded-xl border border-outline-variant/50 bg-surface-container-low px-3 py-2 text-[13px] font-medium text-on-surface transition-colors hover:border-primary/30 hover:bg-surface-container"
             >
               <span className="material-symbols-outlined text-[18px]">space_dashboard</span>
-              <span className="hidden xl:inline">{t('nav.workspace')}</span>
+              <TranslatingText text="Workspace" className="hidden xl:inline" />
             </Link>
 
             {/* Sign In — desktop */}
@@ -342,7 +375,7 @@ export default function Header() {
               className="hidden lg:flex items-center gap-1.5 rounded-xl border border-outline-variant/50 bg-surface-container-low px-3 py-2 text-[13px] font-medium text-on-surface transition-colors hover:border-primary/30 hover:bg-surface-container"
             >
               <span className="material-symbols-outlined text-[18px]">login</span>
-              <span>Sign In</span>
+              <span>{t('header.login', { defaultValue: 'Login' })}</span>
             </Link>
 
             {/* Hamburger — mobile only */}
@@ -372,7 +405,7 @@ export default function Header() {
                       : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                   }`}
                 >
-                  {t(item.key)}
+                  {t(item.key, { defaultValue: item.key.split('.')[1] })}
                 </Link>
               ))}
             </nav>

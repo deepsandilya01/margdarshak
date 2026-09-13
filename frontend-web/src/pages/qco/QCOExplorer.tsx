@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useQCOs } from '../../hooks/useQCOs';
-import { useLanguage } from '../../hooks/useLanguage';
-import { StatusPill, TechIdentifier } from '../../components/shared/StatusPill';
-import { EvidenceBadge, EvidenceDrawer } from '../../components/shared/EvidenceBadge';
-import { EmptyState } from '../../components/shared/EmptyState';
-import type { QCO } from '../../hooks/useQCOs';
+import { useQCOs } from '@/features/qco/hooks/useQCOs';
+import { useLanguage } from '@/hooks/useLanguage';
+import { StatusPill, TechIdentifier } from '@/components/feedback/StatusPill';
+import { EvidenceBadge, EvidenceDrawer } from '@/features/evidence/components/EvidenceBadge';
+import { EmptyState } from '@/components/feedback/EmptyState';
+import type { QCO } from '@/features/qco/hooks/useQCOs';
+import { useWorkspace } from '@/context/WorkspaceContext';
 
 export default function QCOExplorer() {
   const { t } = useLanguage();
@@ -13,6 +14,7 @@ export default function QCOExplorer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'draft' | 'amended'>('all');
   const [evidenceOpen, setEvidenceOpen] = useState<QCO['evidence'] | null>(null);
+  const { saveItem, unsaveItem, isSaved, addToComparison, isInComparison } = useWorkspace();
 
   const q = searchParams.get('q') ?? '';
   const { qcos } = useQCOs({ search: q || undefined, status: filterStatus });
@@ -91,6 +93,25 @@ export default function QCOExplorer() {
                     <span>View QCO</span>
                     <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                   </Link>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); if (isSaved(qco.id)) unsaveItem(qco.id); else saveItem({ id: qco.id, type: 'qco', label: qco.code, title: qco.title }); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-outline-variant/50 text-[13px] font-medium text-on-surface hover:bg-surface-container-low"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">{isSaved(qco.id) ? 'bookmark' : 'bookmark_border'}</span>
+                      {isSaved(qco.id) ? 'Saved' : 'Save'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); addToComparison({ id: qco.id, type: 'qco', label: qco.code, title: qco.title, attributes: { Ministry: qco.ministry_short, Status: qco.status, Effective: qco.effectiveDate, Standards: qco.coveredStandardCodes.join(', ') } }); }}
+                      disabled={isInComparison(qco.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-outline-variant/50 text-[13px] font-medium text-on-surface hover:bg-surface-container-low disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">compare_arrows</span>
+                      {isInComparison(qco.id) ? 'Added' : 'Compare'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

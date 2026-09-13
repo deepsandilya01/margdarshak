@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const RESOURCES = [
   { type: 'Guide', icon: 'menu_book', title: 'BIS Certification Schemes — Complete Guide for Manufacturers', desc: 'A comprehensive guide to Scheme I (ISI Mark Licence), Scheme II (CRS Registration), and Scheme X (Self-Declaration).', date: '2025', size: '2.4 MB', tags: ['certification', 'scheme'] },

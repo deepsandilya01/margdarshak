@@ -1,19 +1,29 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../hooks/useLanguage';
+import { useLanguage } from '@/hooks/useLanguage';
 import { motion } from 'framer-motion';
+import { signUp } from '@/features/auth/services/authService';
 
 export default function Signup() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ name: '', organization: '', email: '', password: '' });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     setTimeout(() => {
-      setLoading(false);
-      navigate('/workspace');
+      try {
+        signUp(form.email, form.password, form.name, form.organization);
+        navigate('/workspace');
+      } catch (submitError) {
+        setError((submitError as Error).message);
+      } finally {
+        setLoading(false);
+      }
     }, 1000);
   };
 
@@ -33,12 +43,15 @@ export default function Signup() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-[13px] text-on-error-container">{error}</p>}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[13px] font-semibold text-on-surface">{t('auth.full_name')}</label>
               <input
                 type="text"
                 required
+                value={form.name}
+                onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
                 className="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface focus:outline-none focus:border-secondary transition-colors"
                 placeholder="Jane Doe"
               />
@@ -48,6 +61,8 @@ export default function Signup() {
               <input
                 type="text"
                 required
+                value={form.organization}
+                onChange={e => setForm(prev => ({ ...prev, organization: e.target.value }))}
                 className="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface focus:outline-none focus:border-secondary transition-colors"
                 placeholder="Acme Corp"
               />
@@ -59,6 +74,8 @@ export default function Signup() {
             <input
               type="email"
               required
+              value={form.email}
+              onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface focus:outline-none focus:border-secondary transition-colors"
               placeholder="name@company.com"
             />
@@ -69,6 +86,8 @@ export default function Signup() {
             <input
               type="password"
               required
+              value={form.password}
+              onChange={e => setForm(prev => ({ ...prev, password: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface focus:outline-none focus:border-secondary transition-colors"
               placeholder="••••••••"
             />

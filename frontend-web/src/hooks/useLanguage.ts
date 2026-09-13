@@ -1,11 +1,18 @@
-import { useLanguageContext, useDynamicTranslation } from '../context/LanguageContext';
-
 /**
- * Convenience re-export of the t() translation function.
- * Usage: const { t, language, setLanguage } = useLanguage();
+ * hooks/useLanguage.ts
+ * Convenience hook — wraps LanguageContext + i18next for backward compat.
+ *
+ * Usage:
+ *   const { t, language, setLanguage, translate } = useLanguage();
  */
+import { useT } from '@/hooks/useTranslation';
+import { useLanguageContext, useDynamicTranslation } from '@/context/LanguageContext';
+
 export function useLanguage() {
-  return useLanguageContext();
+  const { language, setLanguage, translate } = useLanguageContext();
+  const { t, i18n } = useT(['common', 'home', 'aiSathi']);
+
+  return { t, language, setLanguage, translate, i18n };
 }
 
 export { useDynamicTranslation };

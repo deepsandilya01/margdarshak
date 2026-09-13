@@ -1,0 +1,24 @@
+{
+  "header": {
+    "searchPlaceholder": "മാനദണ്ഡങ്ങൾ, ഉൽപ്പന്നങ്ങൾ, QCO, ലബോറട്ടറികൾ തിരയുക...",
+    "language": "ഭാഷ",
+    "login": "ലോഗിൻ ചെയ്യുക"
+  },
+  "nav": {
+    "standards": "സ്റ്റാൻഡേർഡ്സ് എക്സ്പ്ലോറർ",
+    "products": "ഉൽപ്പന്നങ്ങൾ",
+    "qcos": "QCO",
+    "laboratories": "ലബോറട്ടറി ഫൈൻഡർ",
+    "certification": "സർട്ടിഫിക്കേഷൻ",
+    "hallmarking": "ഹാൾമാർക്കിംഗ്",
+    "aiSathi": "AI സാഥി",
+    "consumer_help": "ഉപഭോക്തൃ സഹായം",
+    "resources": "വിഭവങ്ങൾ"
+  },
+  "footer": {
+    "quickLinks": "ദ്രുത ലിങ്കുകൾ",
+    "about": "BIS നെക്കുറിച്ച്",
+    "contact": "ഞങ്ങളെ ബന്ധപ്പെടുക",
+    "help": "സഹായവും പിന്തുണയും"
+  }
+}
