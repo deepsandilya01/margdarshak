@@ -1,9 +1,11 @@
-const express = require("express");
-const { getResources, getResourceById } = require("../controllers/resources.controller");
+import { Router } from "express";
+import { listResources, getResource } from "../controllers/catalog.controller.js";
 
-const router = express.Router();
 
-router.get("/", getResources);
-router.get("/:id", getResourceById);
+const router = Router();
 
-module.exports = router;
+
+router.get("/", listResources('resources'));
+router.get("/:id", getResource('resources'));
+
+export default router;

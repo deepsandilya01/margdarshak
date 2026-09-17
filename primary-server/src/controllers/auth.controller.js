@@ -1,83 +1,94 @@
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ApiError } = require("../utils/ApiError");
-const { asyncHandler } = require("../utils/asyncHandler");
-const authService = require("../services/auth.service");
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import authService from "../services/auth.service.js";
+import crypto from "crypto";
+import { setHandoffCode, getAndClearHandoffCode } from "../services/cache.service.js";
+import env from "../config/env.js";
+import { AppError } from "../utils/AppError.js";
 
-const register = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !name.trim() || !email || !email.trim() || !password) {
-    throw new ApiError(400, "All fields are required", "VALIDATION_ERROR");
+export const register = asyncHandler(async (req, res) => {
+  const result = await authService.registerUser(req.body);
+  return new ApiResponse(201, result, "User registered successfully").send(res);
+});
+
+export const login = asyncHandler(async (req, res) => {
+  const result = await authService.loginUser(req.body);
+  return new ApiResponse(200, result, "Login successful").send(res);
+});
+
+export const getMe = asyncHandler(async (req, res) => {
+  return new ApiResponse(200, { user: req.user }, "Current user fetched successfully").send(res);
+});
+
+export const refresh = asyncHandler(async (req, res) => {
+  const result = await authService.refreshTokens(req.body.refreshToken);
+  return new ApiResponse(200, result, "Access token refreshed successfully").send(res);
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  const authHeader = req.header("Authorization");
+  const accessToken = authHeader ? authHeader.replace("Bearer ", "").trim() : null;
+  const refreshToken = req.body.refreshToken;
+
+  await authService.logoutUser(req.user._id, accessToken, refreshToken);
+  return new ApiResponse(200, null, "Logged out successfully").send(res);
+});
+
+export const googleCallback = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    throw new AppError(401, "Google authentication failed", "OAUTH_FAILED");
   }
 
-  const { user, accessToken, refreshToken } = await authService.registerUser({ name, email, password });
-  return res.status(201).json(new ApiResponse(201, { user, token: accessToken, refreshToken }, "User registered successfully"));
+  // Generate secure random code
+  const code = crypto.randomBytes(32).toString("hex");
+
+  // Save to cache (ttl is 60s)
+  await setHandoffCode(code, { userId: req.user._id.toString() });
+
+  // Redirect to frontend callback with the code
+  res.redirect(`${env.FRONTEND_AUTH_CALLBACK_URL}?code=${code}`);
 });
 
-const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    throw new ApiError(400, "Email and password are required", "VALIDATION_ERROR");
+export const verifyGoogleCode = asyncHandler(async (req, res) => {
+  const { code } = req.body;
+  if (!code) {
+    throw new AppError(400, "Validation code is required", "MISSING_CODE");
   }
 
-  const { user, accessToken, refreshToken } = await authService.loginUser({ email, password });
-  return res.status(200).json(new ApiResponse(200, { user, token: accessToken, refreshToken }, "User logged in successfully"));
-});
-
-const logout = asyncHandler(async (req, res) => {
-  await authService.logoutUser(req.user._id);
-  return res.status(200).json(new ApiResponse(200, {}, "User logged out successfully"));
-});
-
-const getMe = asyncHandler(async (req, res) => {
-  return res.status(200).json(new ApiResponse(200, { user: req.user }, "User fetched successfully"));
-});
-
-const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken = req.body.refreshToken;
-  if (!incomingRefreshToken) {
-    throw new ApiError(401, "Refresh token is missing", "UNAUTHORIZED");
+  const payload = await getAndClearHandoffCode(code);
+  if (!payload || !payload.userId) {
+    throw new AppError(401, "Invalid or expired authorization code", "INVALID_CODE");
   }
 
-  const { accessToken, refreshToken } = await authService.refreshAccessToken(incomingRefreshToken);
-  return res.status(200).json(new ApiResponse(200, { token: accessToken, refreshToken }, "Access token refreshed"));
+  const result = await authService.loginOAuthUser(payload.userId);
+  return new ApiResponse(200, result, "Google authentication successful").send(res);
 });
 
-const forgotPassword = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-  if (!email) throw new ApiError(400, "Email is required", "VALIDATION_ERROR");
-
-  const resetToken = await authService.initiatePasswordReset(email);
-  return res.status(200).json(
-    new ApiResponse(200, { resetToken }, "If an account exists, a reset link will be sent")
-  );
+export const forgotPassword = asyncHandler(async (req, res) => {
+  await authService.forgotPassword(req.body.email);
+  return new ApiResponse(200, null, "If an account with that email exists, password reset instructions have been sent.").send(res);
 });
 
-const resetPassword = asyncHandler(async (req, res) => {
-  const { token, newPassword } = req.body;
-  if (!token || !newPassword) {
-    throw new ApiError(400, "Token and new password are required", "VALIDATION_ERROR");
-  }
-
-  await authService.resetPassword(token, newPassword);
-  return res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
+export const resetPassword = asyncHandler(async (req, res) => {
+  await authService.resetPassword(req.body.token, req.body.newPassword);
+  return new ApiResponse(200, null, "Password has been successfully reset").send(res);
 });
 
-const changePassword = asyncHandler(async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  if (!currentPassword || !newPassword) {
-    throw new ApiError(400, "Current and new passwords are required", "VALIDATION_ERROR");
-  }
-
-  await authService.changePassword(req.user._id, currentPassword, newPassword);
-  return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"));
+export const changePassword = asyncHandler(async (req, res) => {
+  const authHeader = req.header("Authorization");
+  const accessToken = authHeader ? authHeader.replace("Bearer ", "").trim() : null;
+  await authService.changePassword(req.user._id, req.body.currentPassword, req.body.newPassword, accessToken);
+  return new ApiResponse(200, null, "Password changed successfully. Please log in again.").send(res);
 });
 
-module.exports = {
+export default {
   register,
   login,
-  logout,
   getMe,
-  refreshAccessToken,
+  refresh,
+  logout,
+  googleCallback,
+  verifyGoogleCode,
   forgotPassword,
   resetPassword,
   changePassword,

@@ -1,39 +1,40 @@
-const mongoose = require("mongoose");
-const { ApiError } = require("../utils/ApiError");
+import env from "../config/env.js";
+import { AppError } from "../utils/AppError.js";
 
-const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res, next) => {
   let error = err;
 
-  // If the error is not an instance of ApiError, create a new ApiError
-  if (!(error instanceof ApiError)) {
-    const statusCode =
-      error.statusCode || (error instanceof mongoose.Error ? 400 : 500);
-    const message = error.message || "Something went wrong";
-    let code = error.code || "INTERNAL_SERVER_ERROR";
-    
-    // Handle Mongoose duplicate key error
-    if (err.code === 11000) {
-      code = "VALIDATION_ERROR";
-      error.message = "Duplicate key error";
-    }
-
-    error = new ApiError(statusCode, message, code, error?.errors || [], err.stack);
+  // Transform Mongoose duplicate key error (code 11000)
+  if (err.code === 11000) {
+    const duplicateField = Object.keys(err.keyPattern || {})[0] || "field";
+    error = new AppError(
+      409,
+      `A record with that ${duplicateField} already exists`,
+      "RESOURCE_ALREADY_EXISTS"
+    );
   }
+
+  // Transform Mongoose CastError (invalid ObjectId)
+  if (err.name === "CastError") {
+    error = new AppError(400, `Invalid ID format for ${err.path}`, "INVALID_ID");
+  }
+
+  const statusCode = error.statusCode || 500;
+  const message = error.message || "Internal Server Error";
+  const code = error.code || "INTERNAL_SERVER_ERROR";
 
   const response = {
     success: false,
-    data: null,
-    error: {
-      code: error.code,
-      message: error.message,
-    }
+    message,
+    code,
+    ...(error.errors && error.errors.length > 0 ? { errors: error.errors } : {}),
   };
 
-  if (process.env.NODE_ENV === "development") {
-    response.error.stack = error.stack;
+  if (env.NODE_ENV === "development" && error.stack && statusCode === 500) {
+    response.stack = error.stack;
   }
 
-  res.status(error.statusCode || 500).json(response);
+  return res.status(statusCode).json(response);
 };
 
-module.exports = { errorHandler };
+export default errorHandler;

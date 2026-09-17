@@ -50,85 +50,45 @@ db = Chroma(
 )
 
 
-# ============================================================
-# 5. TAKE USER QUERY FROM TERMINAL
-# ============================================================
-
-query = input("\nAsk your question: ")
-
-
-# ============================================================
-# 6. RETRIEVE RELEVANT DOCUMENTS
-# ============================================================
-
-retriever = db.as_retriever(
-    search_kwargs={"k": 5}
-)
-
-relevant_docs = retriever.invoke(query)
-
-# Exact lookup prevents vector similarity from missing a specific IS number.
-is_number_match = re.search(r"\b(?:IS|IS/IEC|IS/ISO)\s*[/A-Z]*\s*\d+", query, re.IGNORECASE)
-if is_number_match:
-    requested_is_number = re.sub(
-        r"\s+", " ", is_number_match.group(0).upper()
-    ).strip()
-    collection_data = db._collection.get(
-        include=["documents", "metadatas"]
+def generate_answer(query, db, model):
+    retriever = db.as_retriever(
+        search_kwargs={"k": 5}
     )
-    exact_docs = []
-    for text, metadata in zip(
-        collection_data.get("documents", []),
-        collection_data.get("metadatas", [])
-    ):
-        normalized_text = re.sub(r"\s+", " ", text.upper())
-        if requested_is_number in normalized_text:
-            from langchain_core.documents import Document
 
-            exact_docs.append(
-                Document(page_content=text, metadata=metadata or {})
-            )
-    if exact_docs:
-        relevant_docs = exact_docs[:5]
+    relevant_docs = retriever.invoke(query)
 
+    # Exact lookup prevents vector similarity from missing a specific IS number.
+    is_number_match = re.search(r"\b(?:IS|IS/IEC|IS/ISO)\s*[/A-Z]*\s*\d+", query, re.IGNORECASE)
+    if is_number_match:
+        requested_is_number = re.sub(
+            r"\s+", " ", is_number_match.group(0).upper()
+        ).strip()
+        collection_data = db._collection.get(
+            include=["documents", "metadatas"]
+        )
+        exact_docs = []
+        for text, metadata in zip(
+            collection_data.get("documents", []),
+            collection_data.get("metadatas", [])
+        ):
+            normalized_text = re.sub(r"\s+", " ", text.upper())
+            if requested_is_number in normalized_text:
+                from langchain_core.documents import Document
 
-# ============================================================
-# 7. DISPLAY USER QUERY
-# ============================================================
+                exact_docs.append(
+                    Document(page_content=text, metadata=metadata or {})
+                )
+        if exact_docs:
+            relevant_docs = exact_docs[:5]
 
-print(f"\nUser Query: {query}")
+    documents = "\n\n".join(
+        [
+            f"Document {i}:\n{doc.page_content}"
+            for i, doc in enumerate(relevant_docs, 1)
+        ]
+    )
 
-
-# ============================================================
-# 8. DISPLAY RETRIEVED DOCUMENTS
-# ============================================================
-
-print("\n--- Retrieved Context ---")
-
-for i, doc in enumerate(relevant_docs, 1):
-
-    print(f"\nDocument {i}:")
-    print(f"Source: {doc.metadata.get('source', 'Unknown')}")
-    print(doc.page_content)
-
-
-# ============================================================
-# 9. COMBINE RETRIEVED DOCUMENTS
-# ============================================================
-
-documents = "\n\n".join(
-    [
-        f"Document {i}:\n{doc.page_content}"
-        for i, doc in enumerate(relevant_docs, 1)
-    ]
-)
-
-
-# ============================================================
-# 10. CREATE PROMPT FOR GEMINI
-# ============================================================
-
-combined_input = f"""
+    combined_input = f"""
 You are a precise information extraction assistant.
 
 USER QUESTION:
@@ -152,25 +112,9 @@ IMPORTANT RULES:
 10. Keep the answer short and direct.
 """
 
-
-# ============================================================
-# 11. LOAD GEMINI
-# ============================================================
-
-model = ChatGoogleGenerativeAI(
-    model="gemini-3.6-flash",
-    temperature=0
-)
-
-
-# ============================================================
-# 12. CREATE MESSAGES
-# ============================================================
-
-messages = [
-
-    SystemMessage(
-        content="""
+    messages = [
+        SystemMessage(
+            content="""
 You are a precise RAG information extraction assistant.
 
 Your job is to answer the user's question using ONLY the
@@ -184,40 +128,66 @@ Never provide unrelated fields.
 
 Never guess or use outside knowledge.
 """
-    ),
+        ),
+        HumanMessage(
+            content=combined_input
+        )
+    ]
 
-    HumanMessage(
-        content=combined_input
-    )
-]
+    result = model.invoke(messages)
+    
+    answer_text = ""
+    if isinstance(result.content, list):
+        for block in result.content:
+            if isinstance(block, dict):
+                if block.get("type") == "text":
+                    answer_text += block.get("text", "")
+    else:
+        answer_text = result.content
+
+    citations = []
+    sources = []
+    for doc in relevant_docs:
+        meta = doc.metadata or {}
+        source = meta.get("source")
+        page = meta.get("page")
+        if source and source not in sources:
+            sources.append(source)
+            citations.append({
+                "source": source,
+                "page": page
+            })
+            
+    return {
+        "answer": answer_text,
+        "citations": citations,
+        "sources": sources,
+        "metadata": {
+            "retrieval": "chromadb"
+        }
+    }
 
 
-# ============================================================
-# 13. GENERATE FINAL ANSWER
-# ============================================================
+if __name__ == "__main__":
+    # ============================================================
+    # 5. TAKE USER QUERY FROM TERMINAL
+    # ============================================================
 
-print("\nGenerating answer...")
+    query = input("\nAsk your question: ")
 
-result = model.invoke(messages)
+    print(f"\nUser Query: {query}")
 
+    # ============================================================
+    # 6. RUN GENERATE ANSWER
+    # ============================================================
+    
+    print("\nGenerating answer...")
+    
+    result = generate_answer(query, db, model)
 
-# ============================================================
-# 14. DISPLAY FINAL ANSWER
-# ============================================================
+    print("\n--- Retrieved Context (Citations) ---")
+    for cit in result["citations"]:
+        print(f"Source: {cit.get('source')}, Page: {cit.get('page')}")
 
-print("\n--- Generated Response ---")
-
-
-if isinstance(result.content, list):
-
-    for block in result.content:
-
-        if isinstance(block, dict):
-
-            if block.get("type") == "text":
-
-                print(block.get("text", ""))
-
-else:
-
-    print(result.content)
+    print("\n--- Generated Response ---")
+    print(result["answer"])

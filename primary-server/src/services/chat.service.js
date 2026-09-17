@@ -1,68 +1,78 @@
-const mongoose = require("mongoose");
-const axios = require("axios");
-const sessionRepository = require("../repositories/session.repository");
-const messageRepository = require("../repositories/message.repository");
-const { ApiError } = require("../utils/ApiError");
+import mongoose from "mongoose";
+import Session from "../models/Session.js";
+import Message from "../models/Message.js";
+import { callChatService } from "./ai.service.js";
+import { AppError } from "../utils/AppError.js";
 
-const processChatRequest = async ({ userId, sessionId, message, language = "en" }) => {
-  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
-    throw new ApiError(400, "Valid sessionId is required", "VALIDATION_ERROR");
+export const processChat = async ({ userId, sessionId, message, language = "en", context = {} }) => {
+  let session;
+
+  if (sessionId) {
+    if (!mongoose.isValidObjectId(sessionId)) {
+      throw new AppError(400, "Invalid sessionId format", "INVALID_ID");
+    }
+    session = await Session.findOne({ _id: sessionId, userId });
+    if (!session) {
+      throw new AppError(404, "Session not found or access denied", "RESOURCE_NOT_FOUND");
+    }
+  } else {
+    // Generate an intuitive title from the first query
+    const cleanMessage = message.trim();
+    const title = cleanMessage.length > 45 ? `${cleanMessage.slice(0, 45)}...` : cleanMessage;
+    session = await Session.create({
+      userId,
+      title: title || "New Chat",
+    });
   }
 
-  // 1. Verify session ownership
-  const session = await sessionRepository.findSessionInstanceByIdForUser(userId, sessionId);
-  if (!session) {
-    throw new ApiError(404, "Session not found", "RESOURCE_NOT_FOUND");
-  }
-
-  // 2. Save user message
-  const userMessage = await messageRepository.createMessage({
-    sessionId,
+  // 1. Persist User Message
+  const userMessage = await Message.create({
+    sessionId: session._id,
+    userId,
     role: "user",
     content: message.trim(),
+    language,
   });
 
-  // Update session updatedAt to bubble it up in history
-  await sessionRepository.updateSessionTime(session);
+  // 2. Bubble session to top of history
+  session.updatedAt = new Date();
+  await session.save();
 
-  // 3. Forward to FastAPI
-  const fastApiUrl = process.env.FASTAPI_URL || "http://localhost:8001";
-  let fastApiResponse;
+  // 3. Invoke Private AI Microservice Bridge
+  const aiResult = await callChatService({
+    sessionId: session._id.toString(),
+    message: message.trim(),
+    language,
+    context,
+  });
 
-  try {
-    const response = await axios.post(`${fastApiUrl}/chat`, {
-      sessionId,
-      message: message.trim(),
-      language,
-    });
-    fastApiResponse = response.data;
-  } catch (error) {
-    console.error("FastAPI Error:", error.message);
-    
-    const errorMsg = await messageRepository.createMessage({
-      sessionId,
-      role: "assistant",
-      content: "I'm sorry, I am currently experiencing technical difficulties processing your request.",
-      status: "error",
-    });
-
-    return { error: true, message: errorMsg };
-  }
-
-  // 4. Save AI Response
-  const assistantMessage = await messageRepository.createMessage({
-    sessionId,
+  // 4. Persist Assistant Response
+  const assistantMessage = await Message.create({
+    sessionId: session._id,
+    userId,
     role: "assistant",
-    content: fastApiResponse.answer || "Processing complete.",
-    status: fastApiResponse.status || "success",
-    intent: fastApiResponse.intent,
-    citations: fastApiResponse.citations || [],
-    requestId: fastApiResponse.requestId,
+    content: aiResult.answer.text || "Processing complete.",
+    language: aiResult.answer.language || language,
+    evidence: aiResult.evidence || [],
+    related: aiResult.related || { standards: [], qcos: [], labs: [] },
+    status: aiResult.status || "success",
+    requestId: aiResult.requestId,
   });
 
-  return { error: false, message: assistantMessage };
+  return {
+    requestId: aiResult.requestId,
+    sessionId: session._id.toString(),
+    status: aiResult.status,
+    answer: aiResult.answer,
+    evidence: aiResult.evidence,
+    related: aiResult.related,
+    actions: aiResult.actions,
+    messageId: assistantMessage._id.toString(),
+    userMessageId: userMessage._id.toString(),
+    sessionTitle: session.title,
+  };
 };
 
-module.exports = {
-  processChatRequest,
+export default {
+  processChat,
 };

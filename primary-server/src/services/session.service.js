@@ -1,41 +1,134 @@
-const mongoose = require("mongoose");
-const sessionRepository = require("../repositories/session.repository");
-const messageRepository = require("../repositories/message.repository");
-const { ApiError } = require("../utils/ApiError");
+import mongoose from "mongoose";
+import Session from "../models/Session.js";
+import Message from "../models/Message.js";
+import { AppError } from "../utils/AppError.js";
 
-const createSession = async (userId, title) => {
-  return await sessionRepository.createSession({ userId, title });
-};
-
-const findSessions = async (userId, page, limit) => {
-  const skip = (page - 1) * limit;
-  return await sessionRepository.findSessionsByUserId(userId, skip, limit);
-};
-
-const findSessionById = async (userId, sessionId) => {
-  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
-    throw new ApiError(400, "Invalid session ID format", "INVALID_ID");
-  }
-
-  const session = await sessionRepository.findSessionByIdForUser(userId, sessionId);
-
-  if (!session) {
-    throw new ApiError(404, "Session not found", "RESOURCE_NOT_FOUND");
-  }
-
+export const createSession = async (userId, title = "New Chat") => {
+  const session = await Session.create({
+    userId,
+    title: title ? title.trim() : "New Chat",
+  });
   return session;
 };
 
-const findSessionMessages = async (userId, sessionId) => {
-  // Verifies ownership implicitly by fetching session
-  await findSessionById(userId, sessionId);
+export const listSessions = async (userId, { page = 1, limit = 50 } = {}) => {
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
+  const skip = (pageNum - 1) * limitNum;
 
-  return await messageRepository.findMessagesBySessionId(sessionId);
+  const [sessions, total] = await Promise.all([
+    Session.find({ userId })
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean(),
+    Session.countDocuments({ userId }),
+  ]);
+
+  return {
+    sessions: sessions.map((s) => ({
+      id: s._id.toString(),
+      title: s.title,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+    })),
+    meta: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
+  };
 };
 
-module.exports = {
+export const getSessionById = async (userId, sessionId) => {
+  if (!mongoose.isValidObjectId(sessionId)) {
+    throw new AppError(400, "Invalid sessionId format", "INVALID_ID");
+  }
+
+  const session = await Session.findOne({ _id: sessionId, userId }).lean();
+  if (!session) {
+    throw new AppError(404, "Session not found or access denied", "RESOURCE_NOT_FOUND");
+  }
+
+  return {
+    id: session._id.toString(),
+    title: session.title,
+    createdAt: session.createdAt,
+    updatedAt: session.updatedAt,
+  };
+};
+
+export const updateSession = async (userId, sessionId, { title }) => {
+  if (!mongoose.isValidObjectId(sessionId)) {
+    throw new AppError(400, "Invalid sessionId format", "INVALID_ID");
+  }
+
+  const session = await Session.findOneAndUpdate(
+    { _id: sessionId, userId },
+    { $set: { title: title ? title.trim() : "New Chat" } },
+    { new: true }
+  );
+
+  if (!session) {
+    throw new AppError(404, "Session not found or access denied", "RESOURCE_NOT_FOUND");
+  }
+
+  return {
+    id: session._id.toString(),
+    title: session.title,
+    createdAt: session.createdAt,
+    updatedAt: session.updatedAt,
+  };
+};
+
+export const getSessionMessages = async (userId, sessionId) => {
+  if (!mongoose.isValidObjectId(sessionId)) {
+    throw new AppError(400, "Invalid sessionId format", "INVALID_ID");
+  }
+
+  // Verify session exists and belongs to the authenticated user
+  const session = await Session.findOne({ _id: sessionId, userId });
+  if (!session) {
+    throw new AppError(404, "Session not found or access denied", "RESOURCE_NOT_FOUND");
+  }
+
+  const messages = await Message.find({ sessionId }).sort({ createdAt: 1 }).lean();
+
+  return messages.map((m) => ({
+    id: m._id.toString(),
+    role: m.role,
+    content: m.content,
+    language: m.language,
+    evidence: m.evidence || [],
+    related: m.related || { standards: [], qcos: [], labs: [] },
+    status: m.status,
+    requestId: m.requestId,
+    createdAt: m.createdAt,
+  }));
+};
+
+export const deleteSession = async (userId, sessionId) => {
+  if (!mongoose.isValidObjectId(sessionId)) {
+    throw new AppError(400, "Invalid sessionId format", "INVALID_ID");
+  }
+
+  const session = await Session.findOneAndDelete({ _id: sessionId, userId });
+  if (!session) {
+    throw new AppError(404, "Session not found or access denied", "RESOURCE_NOT_FOUND");
+  }
+
+  // Delete all messages associated with this session
+  await Message.deleteMany({ sessionId });
+
+  return true;
+};
+
+export default {
   createSession,
-  findSessions,
-  findSessionById,
-  findSessionMessages,
+  listSessions,
+  getSessionById,
+  updateSession,
+  getSessionMessages,
+  deleteSession,
 };

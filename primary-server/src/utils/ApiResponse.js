@@ -1,38 +1,22 @@
-export function successResponse(
-  res,
-  statusCode = 200,
-  message = "Success",
-  data = {},
-  meta = null,
-) {
-  const payload = {
-    success: true,
-    data: data ?? null,
-    meta: meta ?? null,
-    error: null,
-  };
-
-  if (message && message !== "Success") {
-    payload.message = message;
+export class ApiResponse {
+  constructor(statusCode, data = null, message = "Success", meta = null) {
+    this.success = statusCode < 400;
+    this.statusCode = statusCode;
+    this.message = message;
+    this.data = data;
+    if (meta !== null && meta !== undefined) {
+      this.meta = meta;
+    }
   }
 
-  return res.status(statusCode).json(payload);
+  send(res) {
+    return res.status(this.statusCode).json({
+      success: this.success,
+      message: this.message,
+      data: this.data,
+      ...(this.meta ? { meta: this.meta } : {}),
+    });
+  }
 }
 
-export function errorResponse(
-  res,
-  statusCode = 400,
-  message = "Request failed",
-  code = "BAD_REQUEST",
-  details = null,
-) {
-  const payload = {
-    success: false,
-    data: null,
-    error: { code, message, ...(details ? { details } : {}) },
-    code,
-    message,
-  };
-
-  return res.status(statusCode).json(payload);
-}
+export default ApiResponse;

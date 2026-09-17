@@ -1,9 +1,11 @@
-const express = require("express");
-const { getStandards, getStandardById } = require("../controllers/standards.controller");
+import { Router } from "express";
+import { listResources, getResource } from "../controllers/catalog.controller.js";
 
-const router = express.Router();
 
-router.get("/", getStandards);
-router.get("/:id", getStandardById);
+const router = Router();
 
-module.exports = router;
+
+router.get("/", listResources('standards'));
+router.get("/:id", getResource('standards'));
+
+export default router;

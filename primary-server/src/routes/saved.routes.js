@@ -1,13 +1,15 @@
-const express = require("express");
-const { getSavedItems, saveItem, deleteSavedItem } = require("../controllers/saved.controller");
-const { requireAuth } = require("../middleware/auth.middleware");
+import { Router } from "express";
+import { getSavedItems, saveItem, deleteSavedItem } from "../controllers/saved.controller.js";
+import { requireAuth } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { saveItemSchema } from "../validators/saved.validator.js";
 
-const router = express.Router();
+const router = Router();
 
 router.use(requireAuth);
 
 router.get("/", getSavedItems);
-router.post("/", saveItem);
+router.post("/", validate(saveItemSchema), saveItem);
 router.delete("/:id", deleteSavedItem);
 
-module.exports = router;
+export default router;

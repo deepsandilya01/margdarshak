@@ -1,9 +1,12 @@
-const express = require("express");
-const { chat } = require("../controllers/chat.controller");
-const { requireAuth } = require("../middleware/auth.middleware");
+import { Router } from "express";
+import { sendMessage } from "../controllers/chat.controller.js";
+import { requireAuth } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { chatLimiter } from "../middleware/rateLimit.middleware.js";
+import { chatSchema } from "../validators/chat.validator.js";
 
-const router = express.Router();
+const router = Router();
 
-router.post("/", requireAuth, chat);
+router.post("/", requireAuth, chatLimiter, validate(chatSchema), sendMessage);
 
-module.exports = router;
+export default router;

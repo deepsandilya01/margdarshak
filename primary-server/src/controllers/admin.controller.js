@@ -1,30 +1,20 @@
-const { ApiResponse } = require("../utils/ApiResponse");
-const { asyncHandler } = require("../utils/asyncHandler");
-const adminService = require("../services/admin.service");
+import { User } from "../models/User.js";
+import { Standard } from "../models/Standard.js";
+import { AppError } from "../utils/AppError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await adminService.fetchAllUsers();
-  return res.status(200).json(
-    new ApiResponse(200, users, "Users retrieved successfully")
-  );
+export const listUsers = asyncHandler(async (req, res) => {
+  const users = await User.find().select('-password -__v').limit(50).lean();
+  res.status(200).json({ success: true, data: users });
 });
 
-const createStandard = asyncHandler(async (req, res) => {
-  const newStandard = await adminService.createStandardRecord(req.body);
-  return res.status(201).json(
-    new ApiResponse(201, newStandard, "Standard created successfully")
-  );
+export const createStandard = asyncHandler(async (req, res) => {
+  const standard = await Standard.create(req.body);
+  res.status(201).json({ success: true, data: standard });
 });
 
-const updateStandard = asyncHandler(async (req, res) => {
-  const standard = await adminService.updateStandardRecord(req.params.id, req.body);
-  return res.status(200).json(
-    new ApiResponse(200, standard, "Standard updated successfully")
-  );
+export const updateStandard = asyncHandler(async (req, res) => {
+  const standard = await Standard.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!standard) throw new AppError(404, "Standard not found", "NOT_FOUND");
+  res.status(200).json({ success: true, data: standard });
 });
-
-module.exports = {
-  getAllUsers,
-  createStandard,
-  updateStandard,
-};

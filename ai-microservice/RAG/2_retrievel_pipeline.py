@@ -3,38 +3,40 @@ import os
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
-persistent_directory = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "chroma_db"
-)
+def search_documents(query, db, k=5):
+    retriever = db.as_retriever(search_kwargs={"k": k})
+    relevant_docs = retriever.invoke(query)
+    return relevant_docs
 
-# Load the SAME embedding model used during ingestion
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+if __name__ == "__main__":
+    persistent_directory = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "chroma_db"
+    )
 
-# Load existing ChromaDB
-db = Chroma(
-    persist_directory=persistent_directory,
-    embedding_function=embedding_model,
-    collection_metadata={"hnsw:space": "cosine"}
-)
+    # Load the SAME embedding model used during ingestion
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
 
-# Search for relevant documents
-query = "AES Laboratories (P) Ltd Noida OSL"
+    # Load existing ChromaDB
+    db = Chroma(
+        persist_directory=persistent_directory,
+        embedding_function=embedding_model,
+        collection_metadata={"hnsw:space": "cosine"}
+    )
 
-retriever = db.as_retriever(
-    search_kwargs={"k": 5}
-)
+    # Search for relevant documents
+    query = "AES Laboratories (P) Ltd Noida OSL"
+    
+    relevant_docs = search_documents(query, db, k=5)
 
-relevant_docs = retriever.invoke(query)
+    print(f"User Query: {query}")
 
-print(f"User Query: {query}")
+    # Display results
+    print("\n--- Context ---")
 
-# Display results
-print("\n--- Context ---")
-
-for i, doc in enumerate(relevant_docs, 1):
-    print(f"\nDocument {i}:")
-    print(f"Source: {doc.metadata.get('source', 'Unknown')}")
-    print(doc.page_content)
+    for i, doc in enumerate(relevant_docs, 1):
+        print(f"\nDocument {i}:")
+        print(f"Source: {doc.metadata.get('source', 'Unknown')}")
+        print(doc.page_content)

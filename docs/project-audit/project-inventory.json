@@ -1,0 +1,144 @@
+{
+  "project": "BIS-SATHI",
+  "problemStatement": "26107",
+  "team": "AsyncOrbit",
+  "auditDate": "2026-09-17",
+  "directories": [
+    { "name": "primary-server", "type": "Node.js Backend", "status": "Inoperable (boot syntax error)" },
+    { "name": "frontend-web", "type": "React 19 Vite SPA", "status": "Functional (Mock JSON)" },
+    { "name": "mobile-app", "type": "React Native Expo", "status": "Functional (Mock JSON)" },
+    { "name": "ai-microservice", "type": "Python RAG Scripts", "status": "Offline scripts (No web server)" },
+    { "name": "data-ingestion", "type": "Scrapers / Pipelines", "status": "Empty (0 files)" },
+    { "name": "data", "type": "Raw Datasets", "status": "Empty (data.txt is 0 bytes)" },
+    { "name": "docs", "type": "Specifications & Blueprints", "status": "Complete" }
+  ],
+  "backend": {
+    "framework": "Express 4.21.0 (CommonJS)",
+    "nodeModulesInstalled": false,
+    "startupBlocked": true,
+    "blockerReason": "SyntaxError in apiResponse.js (ESM in CommonJS) and missing MONGODB_URI in .env",
+    "routes": [
+      { "path": "/api/v1/auth/register", "method": "POST", "auth": false, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/login", "method": "POST", "auth": false, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/logout", "method": "POST", "auth": true, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/me", "method": "GET", "auth": true, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/refresh", "method": "POST", "auth": false, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/forgot-password", "method": "POST", "auth": false, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/reset-password", "method": "POST", "auth": false, "controller": "auth.controller.js" },
+      { "path": "/api/v1/auth/change-password", "method": "POST", "auth": true, "controller": "auth.controller.js" },
+      { "path": "/api/v1/chat", "method": "POST", "auth": true, "controller": "chat.controller.js" },
+      { "path": "/api/v1/sessions", "method": "POST", "auth": true, "controller": "session.controller.js" },
+      { "path": "/api/v1/sessions", "method": "GET", "auth": true, "controller": "session.controller.js" },
+      { "path": "/api/v1/sessions/:id", "method": "GET", "auth": true, "controller": "session.controller.js" },
+      { "path": "/api/v1/sessions/:id/messages", "method": "GET", "auth": true, "controller": "session.controller.js" },
+      { "path": "/api/v1/standards", "method": "GET", "auth": false, "controller": "standards.controller.js" },
+      { "path": "/api/v1/standards/:id", "method": "GET", "auth": false, "controller": "standards.controller.js" },
+      { "path": "/api/v1/qcos", "method": "GET", "auth": false, "controller": "qco.controller.js" },
+      { "path": "/api/v1/qcos/:id", "method": "GET", "auth": false, "controller": "qco.controller.js" },
+      { "path": "/api/v1/labs", "method": "GET", "auth": false, "controller": "labs.controller.js" },
+      { "path": "/api/v1/labs/:id", "method": "GET", "auth": false, "controller": "labs.controller.js" },
+      { "path": "/api/v1/resources", "method": "GET", "auth": false, "controller": "resources.controller.js" },
+      { "path": "/api/v1/resources/:id", "method": "GET", "auth": false, "controller": "resources.controller.js" },
+      { "path": "/api/v1/reports", "method": "GET", "auth": true, "controller": "reports.controller.js" },
+      { "path": "/api/v1/reports/:id", "method": "GET", "auth": true, "controller": "reports.controller.js" },
+      { "path": "/api/v1/compliance/journeys", "method": "GET", "auth": true, "controller": "compliance.controller.js" },
+      { "path": "/api/v1/compliance/journeys/:id", "method": "GET", "auth": true, "controller": "compliance.controller.js" },
+      { "path": "/api/v1/comparison", "method": "POST", "auth": false, "controller": "comparison.controller.js" },
+      { "path": "/api/v1/saved", "method": "GET", "auth": true, "controller": "saved.controller.js" },
+      { "path": "/api/v1/saved", "method": "POST", "auth": true, "controller": "saved.controller.js" },
+      { "path": "/api/v1/saved/:id", "method": "DELETE", "auth": true, "controller": "saved.controller.js" },
+      { "path": "/api/v1/admin/users", "method": "GET", "auth": true, "role": "ADMIN", "controller": "admin.controller.js" },
+      { "path": "/api/v1/admin/standards", "method": "POST", "auth": true, "role": "ADMIN", "controller": "admin.controller.js" },
+      { "path": "/api/v1/admin/standards/:id", "method": "PUT", "auth": true, "role": "ADMIN", "controller": "admin.controller.js" }
+    ],
+    "unmountedRouteFiles": [
+      "primary-server/src/routes/data.routes.js"
+    ],
+    "models": [
+      "User",
+      "Standard",
+      "QCO",
+      "Laboratory",
+      "Resource",
+      "Report",
+      "ComplianceJourney (compliance.model.js)",
+      "ComplianceJourney (complianceJourney.model.js - dead)",
+      "SavedItem",
+      "Session",
+      "Message"
+    ]
+  },
+  "frontend": {
+    "framework": "React 19.2.8 + Vite 8.3.0",
+    "nodeModulesInstalled": true,
+    "routesCount": 24,
+    "apiClientConfigured": false,
+    "mockDataFiles": [
+      { "path": "src/data/standards/standards.json", "records": 8 },
+      { "path": "src/data/qco/qco.json", "records": 5 },
+      { "path": "src/data/laboratories/labs.json", "records": 5 },
+      { "path": "src/data/resources/resources.json", "records": 5 },
+      { "path": "src/data/reports/reports.json", "records": 3 },
+      { "path": "src/data/compliance/complianceJourneys.json", "records": 2 }
+    ],
+    "totalRecords": 28,
+    "authMode": "localStorage mock (mock-session-...)"
+  },
+  "mobile": {
+    "framework": "React Native 0.76.7 + Expo 52.0.37",
+    "nodeModulesInstalled": false,
+    "screensCount": 24,
+    "authMode": "mock session"
+  },
+  "aiService": {
+    "fastApiAppExists": false,
+    "httpEndpoints": [],
+    "scripts": [
+      "ai-microservice/RAG/1_ingestion_pipeline.py",
+      "ai-microservice/RAG/2_retrievel_pipeline.py",
+      "ai-microservice/RAG/3_answer_generation.py"
+    ],
+    "vectorDatabaseUsed": "ChromaDB (local)",
+    "pineconeUsed": false,
+    "llmModel": "gemini-3.6-flash (ChatGoogleGenerativeAI)",
+    "documentsInStore": 0
+  },
+  "issues": [
+    {
+      "id": "BLK-01",
+      "severity": "CRITICAL",
+      "title": "ApiResponse CommonJS vs ES Module import collision crashes server boot",
+      "file": "primary-server/src/utils/apiResponse.js"
+    },
+    {
+      "id": "BLK-02",
+      "severity": "CRITICAL",
+      "title": "Primary server environment variable mismatch (MONGO_URI vs MONGODB_URI) crashes DB connection",
+      "file": "primary-server/src/config/db.js"
+    },
+    {
+      "id": "BLK-03",
+      "severity": "CRITICAL",
+      "title": "FastAPI AI microservice does not exist; Node chat.service.js fails on closed port 8001",
+      "file": "ai-microservice"
+    },
+    {
+      "id": "SEC-01",
+      "severity": "CRITICAL",
+      "title": "Committed live database, Redis, SMTP, and ImageKit credentials in source control",
+      "file": "primary-server/.env"
+    },
+    {
+      "id": "INT-01",
+      "severity": "HIGH",
+      "title": "Frontend services read local mock JSON files directly instead of invoking Node REST APIs",
+      "file": "frontend-web/src/features"
+    },
+    {
+      "id": "INT-02",
+      "severity": "HIGH",
+      "title": "Frontend authentication is completely simulated in localStorage with fake tokens",
+      "file": "frontend-web/src/features/auth/services/authService.ts"
+    }
+  ]
+}

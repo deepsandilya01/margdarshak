@@ -1,43 +1,60 @@
-const jwt = require("jsonwebtoken");
-const { ApiError } = require("../utils/ApiError");
-const { asyncHandler } = require("../utils/asyncHandler");
-const userRepository = require("../repositories/user.repository");
+import jwt from "jsonwebtoken";
+import env from "../config/env.js";
+import { AppError } from "../utils/AppError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import User from "../models/User.js";
+import tokenBlacklist from "../services/tokenBlacklist.service.js";
 
-const requireAuth = asyncHandler(async (req, res, next) => {
+export const requireAuth = asyncHandler(async (req, res, next) => {
+  const authHeader = req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new AppError(401, "Authorization header missing or invalid", "UNAUTHORIZED");
+  }
+
+  const token = authHeader.replace("Bearer ", "").trim();
+  if (!token) {
+    throw new AppError(401, "Access token missing", "UNAUTHORIZED");
+  }
+
   try {
-    const authHeader = req.header("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new ApiError(401, "Unauthorized request", "UNAUTHORIZED");
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET);
+
+    if (decoded.jti) {
+      const isBlacklisted = await tokenBlacklist.isAccessTokenBlacklisted(decoded.jti);
+      if (isBlacklisted) {
+        throw new AppError(401, "Token has been revoked", "TOKEN_REVOKED");
+      }
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    if (!token) {
-      throw new ApiError(401, "Unauthorized request", "UNAUTHORIZED");
-    }
-
-    const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET || "default_access_secret");
-
-    const user = await userRepository.findUserById(decodedToken.sub);
+    const user = await User.findById(decoded.sub);
 
     if (!user) {
-      throw new ApiError(401, "Invalid Access Token", "INVALID_TOKEN");
-    }
-
-    if (!user.isActive) {
-      throw new ApiError(401, "Account is disabled", "ACCOUNT_DISABLED");
+      throw new AppError(401, "User no longer exists or session invalid", "INVALID_TOKEN");
     }
 
     req.user = user;
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      next(new ApiError(401, "Token has expired", "TOKEN_EXPIRED"));
-    } else if (error.name === "JsonWebTokenError") {
-      next(new ApiError(401, "Invalid Access Token", "INVALID_TOKEN"));
-    } else {
-      next(error);
+      throw new AppError(401, "Access token has expired", "TOKEN_EXPIRED");
     }
+    if (error.name === "JsonWebTokenError") {
+      throw new AppError(401, "Invalid access token", "INVALID_TOKEN");
+    }
+    throw error;
   }
 });
 
-module.exports = { requireAuth };
+
+
+export const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      throw new AppError(403, "You do not have permission to perform this action", "FORBIDDEN");
+    }
+    next();
+  };
+};
+
+export const protect = requireAuth;
+export default requireAuth;

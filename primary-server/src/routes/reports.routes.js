@@ -1,12 +1,11 @@
-const express = require("express");
-const { getReports, getReportById } = require("../controllers/reports.controller");
-const { requireAuth } = require("../middleware/auth.middleware");
+import { Router } from "express";
+import { listResources, getResource } from "../controllers/catalog.controller.js";
+import { protect } from "../middleware/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
+router.use(protect);
 
-router.use(requireAuth);
+router.get("/", listResources('reports'));
+router.get("/:id", getResource('reports'));
 
-router.get("/", getReports);
-router.get("/:id", getReportById);
-
-module.exports = router;
+export default router;
