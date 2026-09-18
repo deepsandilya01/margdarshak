@@ -10,10 +10,9 @@ export const connectRedis = async () => {
     url: env.REDIS_URL,
     socket: {
       reconnectStrategy: (retries) => {
-        if (retries >= 3) {
-          return new Error("Max reconnect attempts reached");
-        }
-        return Math.min(retries * 500, 2000);
+        // Allow infinite reconnects to prevent "The client is closed" permanent error.
+        // Cap the delay between attempts to 5 seconds.
+        return Math.min(retries * 500, 5000);
       },
     },
   });

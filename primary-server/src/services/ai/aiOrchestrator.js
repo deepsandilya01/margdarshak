@@ -22,6 +22,24 @@ export const process = async ({ message, language = "auto", context = {}, histor
   const id = requestId();
   const detectedLanguage = languageDetector(message, language);
   const intent = intentDetector(message);
+
+  if (intent === "conversational") {
+    const greetingText = detectedLanguage === "hi"
+      ? "नमस्ते! मैं AI SATHI हूँ। मैं भारतीय मानकों, BIS प्रमाणीकरण, QCOs, या परीक्षण प्रयोगशालाओं से संबंधित आपकी कैसे मदद कर सकता हूँ?"
+      : "Hello! I'm AI SATHI. How can I help you with Indian Standards, BIS certification, QCOs, testing laboratories, or other BIS services?";
+    return {
+      requestId: id,
+      status: "success",
+      intent,
+      language: detectedLanguage,
+      answer: { text: greetingText, language: detectedLanguage },
+      evidence: [],
+      citations: [],
+      related: { standards: [], qcos: [], labs: [] },
+      actions: [],
+    };
+  }
+
   let rag = { evidence: [], sufficient: false, score: 0, coverage: 0 };
   let webEvidence = [];
   const pdfEvidence = Array.isArray(rag.evidence) ? rag.evidence : [];

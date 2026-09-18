@@ -15,7 +15,16 @@ export const search = async (query) => {
     include_domains: allowedDomains,
   }, { timeout: env.AI_TIMEOUT_MS });
 
-  return (response.data.results || []).map((result) => ({
+  const stopWords = new Set(["what", "is", "the", "a", "an", "for", "in", "of", "and", "to", "are", "how", "why", "can", "you", "tell", "me", "about"]);
+  const queryWords = query.toLowerCase().split(/\s+/).filter((w) => w.length > 2 && !stopWords.has(w));
+
+  const relevantResults = (response.data.results || []).filter((result) => {
+    if (queryWords.length === 0) return true;
+    const text = (result.title + " " + result.content).toLowerCase();
+    return queryWords.some((w) => text.includes(w)) || text.includes("bis ") || text.includes("standard");
+  });
+
+  return relevantResults.map((result) => ({
     id: `web-${Buffer.from(result.url).toString("base64url").slice(0, 32)}`,
     title: result.title,
     url: result.url,

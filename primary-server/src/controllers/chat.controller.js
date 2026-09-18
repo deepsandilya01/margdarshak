@@ -11,7 +11,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
   // Cache Key Generation (deterministic elements only)
   const cachePayload = `${req.user._id}:${sessionId}:${resolvedLanguage}:${message}`;
   const cacheHash = crypto.createHash("sha256").update(cachePayload).digest("hex");
-  const cacheKey = `cache:ai:${cacheHash}`;
+  const cacheKey = `cache:ai:v2:${cacheHash}`;
 
   if (redisService.isRedisReady()) {
     const cachedResponse = await redisService.get(cacheKey);
@@ -33,7 +33,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
     context,
   });
 
-  if (redisService.isRedisReady() && result) {
+  if (redisService.isRedisReady() && result && result.status === "success") {
     // Cache for 5 minutes
     await redisService.setWithTTL(cacheKey, JSON.stringify(result), 300);
   }
