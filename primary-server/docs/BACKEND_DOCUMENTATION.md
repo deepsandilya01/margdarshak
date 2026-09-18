@@ -16,12 +16,12 @@ graph TD
     Service --> Repository[Domain Repository]
     Repository --> Mongoose[Mongoose Model]
     Mongoose --> MongoDB[(MongoDB)]
-    Service -.->|AI Queries| FastAPI[FastAPI AI Service]
+    Service -.->|AI Queries| AI[Internal Node.js AI Orchestrator]
 ```
 
 ### Separation of Concerns
 - **Controllers** (`src/controllers/*.controller.js`) strictly handle request parsing, invoke the relevant service, and wrap the return data in standardized `ApiResponse` payloads. They contain ZERO business logic or database queries.
-- **Services** (`src/services/*.service.js`) strictly handle domain-specific business rules, throwing `ApiError` validations, and external integrations (e.g., Axios to FastAPI). They contain ZERO direct Mongoose queries.
+- **Services** (`src/services/*.service.js`) strictly handle domain-specific business rules, throwing `ApiError` validations, and external integrations (e.g., Mistral LLM, Pinecone, and Tavily APIs). They contain ZERO direct Mongoose queries.
 - **Repositories** (`src/repositories/*.repository.js`) strictly encapsulate the database queries. They execute `.find()`, `.create()`, `.findOne()` etc., on the raw Mongoose Models. They contain ZERO business logic or validation blocking.
 
 ---
@@ -63,7 +63,7 @@ graph TD
 | `POST /api/v1/comparison` | `comparison.controller.js` | `comparison.service.js` | `comparison.repository.js` | `(Polymorphic)` |
 
 ### D. AI & Assistant Modules (`session`, `chat`)
-*Handles communication directly through the Node gateway into the private FastAPI layer.*
+*Handles communication directly through the Node gateway into the internal JavaScript AI orchestration layer.*
 | Endpoint | Controller | Service | Repository | Model |
 |----------|------------|---------|------------|-------|
 | `POST /api/v1/sessions` | `session.controller.js` | `session.service.js` | `session.repository.js` | `Session` |
@@ -92,4 +92,4 @@ const findReportByOriginalId = async (userId, id) => {
 };
 ```
 ### AI Gateway Safety (`chat.service.js`)
-The FastAPI AI service is **NEVER** publicly exposed to frontend requests. The Node backend parses incoming requests, utilizes `message.repository.js` to create the database record chronologically, securely forwards the payload behind-the-scenes to `localhost:8001`, awaits the response, and persists the generated assistant `Message` back into the user's `Session`.
+The internal AI stack is **NEVER** publicly exposed as provider-specific APIs. The Node backend validates requests, persists the conversation, retrieves BIS PDF evidence from Pinecone first, invokes Tavily only when evidence is insufficient, calls the configured LLM, validates citations, and persists the generated assistant `Message` back into the user's `Session`.

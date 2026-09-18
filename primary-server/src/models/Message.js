@@ -2,13 +2,21 @@ import mongoose from "mongoose";
 
 const evidenceSchema = new mongoose.Schema(
   {
+    id: { type: String, default: null },
     sourceId: { type: String, default: null },
+    sourceType: { type: String, default: "standard" },
     title: { type: String, required: true },
+    text: { type: String, default: null },
+    documentId: { type: String, default: null },
     standardNumber: { type: String, default: null },
     authority: { type: String, default: "BIS" },
     sourceUrl: { type: String, default: null },
+    url: { type: String, default: null },
     page: { type: Number, default: null },
+    section: { type: String, default: null },
     clause: { type: String, default: null },
+    score: { type: Number, default: null },
+    verified: { type: Boolean, default: false },
   },
   { _id: false }
 );

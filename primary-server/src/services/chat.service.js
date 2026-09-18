@@ -4,7 +4,7 @@ import Message from "../models/Message.js";
 import { callChatService } from "./ai.service.js";
 import { AppError } from "../utils/AppError.js";
 
-export const processChat = async ({ userId, sessionId, message, language = "en", context = {} }) => {
+export const processChat = async ({ userId, sessionId, message, language = "auto", context = {} }) => {
   let session;
 
   if (sessionId) {
@@ -38,12 +38,17 @@ export const processChat = async ({ userId, sessionId, message, language = "en",
   session.updatedAt = new Date();
   await session.save();
 
-  // 3. Invoke Private AI Microservice Bridge
+  // 3. Retrieve a bounded conversation context and run the internal Node AI stack
+  const history = await Message.find({ sessionId: session._id, role: { $in: ["user", "assistant"] } })
+    .sort({ createdAt: -1 })
+    .limit(6)
+    .lean();
   const aiResult = await callChatService({
     sessionId: session._id.toString(),
     message: message.trim(),
     language,
     context,
+    history: history.reverse().map((item) => ({ role: item.role, content: item.content })),
   });
 
   // 4. Persist Assistant Response
@@ -65,6 +70,9 @@ export const processChat = async ({ userId, sessionId, message, language = "en",
     status: aiResult.status,
     answer: aiResult.answer,
     evidence: aiResult.evidence,
+    context: aiResult.evidence || [],
+    citations: aiResult.citations || [],
+    intent: aiResult.intent,
     related: aiResult.related,
     actions: aiResult.actions,
     messageId: assistantMessage._id.toString(),

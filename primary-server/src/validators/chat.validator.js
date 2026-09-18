@@ -6,6 +6,6 @@ export const chatSchema = z.object({
     .trim()
     .min(1, "Message cannot be empty"),
   sessionId: z.string().trim().optional(),
-  language: z.string().trim().default("en"),
+  language: z.string().trim().default("auto"),
   context: z.record(z.unknown()).optional(),
 });

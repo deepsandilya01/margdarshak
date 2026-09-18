@@ -22,7 +22,7 @@ This document outlines the test scenarios executed against the Primary Backend A
 | Test ID | Module | Endpoint | Scenario | Expected | Status |
 |---------|--------|----------|----------|----------|--------|
 | TC-SESSION-001 | Session | `POST /sessions` | User creating AI Thread | `201 Created` | ✅ PASS |
-| TC-CHAT-001 | Chat | `POST /chat` | Submit message (Mocking FastAPI failure fallback) | `500 Server Error` + Persisted "Error Message" | ✅ PASS |
+| TC-CHAT-001 | Chat | `POST /chat` | Submit message (provider failure fallback) | Controlled AI fallback response + persisted assistant message | ✅ PASS |
 | TC-SESSION-011 | Session | `GET /sessions/:id/messages`| Validate chronologized context rendering | `200 OK` (2 Msg array) | ✅ PASS |
 
 ## 4. IDOR (Insecure Direct Object Reference) Protections

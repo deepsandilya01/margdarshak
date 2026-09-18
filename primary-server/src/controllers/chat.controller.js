@@ -6,7 +6,7 @@ import redisService from "../services/redis.service.js";
 
 export const sendMessage = asyncHandler(async (req, res) => {
   const { message, sessionId, language, context } = req.body;
-  const resolvedLanguage = language || req.user.preferredLanguage || "en";
+  const resolvedLanguage = language || req.user.preferredLanguage || "auto";
 
   // Cache Key Generation (deterministic elements only)
   const cachePayload = `${req.user._id}:${sessionId}:${resolvedLanguage}:${message}`;

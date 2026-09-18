@@ -12,6 +12,7 @@ const startServer = async () => {
     // Dynamically import Express app AFTER Redis is fully connected
     // This resolves the rateLimit.middleware.js race condition
     const { default: app } = await import("./app.js");
+    const { initSocket } = await import("./services/socket.service.js");
 
     const server = app.listen(env.PORT, () => {
       console.log(`\n======================================================`);
@@ -20,6 +21,10 @@ const startServer = async () => {
       console.log(`🩺 Health Check: http://localhost:${env.PORT}/health`);
       console.log(`======================================================\n`);
     });
+
+    // Initialize Socket.io
+    initSocket(server);
+    console.log(`🔌 Socket.io initialized successfully.`);
 
     // Graceful Shutdown Handlers
     const shutdown = async (signal) => {
