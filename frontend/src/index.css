@@ -1,0 +1,1140 @@
+@import "tailwindcss";
+
+/* ============================================
+   BIS-SATHI Design System — Global CSS
+   Extracted from Stitch project/4322623989939431589
+   Fonts loaded via index.html <link> tags
+   ============================================ */
+
+/* ============================================
+   Design Tokens — CSS Custom Properties
+   ============================================ */
+@theme {
+  /* Map Tailwind colors to our CSS variables */
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-on-primary-fixed: var(--on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+  --color-inverse-primary: var(--inverse-primary);
+
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-secondary-fixed: var(--secondary-fixed);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-variant: var(--surface-variant);
+  --color-surface-tint: var(--surface-tint);
+
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+
+  --color-status-compliant-bg: var(--status-compliant-bg);
+  --color-status-compliant-text: var(--status-compliant-text);
+  --color-status-compliant-border: var(--status-compliant-border);
+  --color-status-compliant-dot: var(--status-compliant-dot);
+
+  --color-status-pending-bg: var(--status-pending-bg);
+  --color-status-pending-text: var(--status-pending-text);
+  --color-status-pending-border: var(--status-pending-border);
+  --color-status-pending-dot: var(--status-pending-dot);
+
+  --color-status-verify-bg: var(--status-verify-bg);
+  --color-status-verify-text: var(--status-verify-text);
+  --color-status-verify-border: var(--status-verify-border);
+  --color-status-verify-dot: var(--status-verify-dot);
+
+  --color-tech-id-bg: var(--tech-id-bg);
+  --color-tech-id-border: var(--tech-id-border);
+  --color-tech-id-text: var(--tech-id-text);
+
+  /* Tricolor Accent System */
+  --color-accent-saffron: var(--accent-saffron);
+  --color-accent-neutral: var(--accent-neutral);
+  --color-accent-green: var(--accent-green);
+
+  /* Typography — Font Families */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", Menlo, Monaco, monospace;
+
+  /* Typography — display-lg */
+  --text-display-lg: 36px;
+  --text-display-lg--line-height: 44px;
+  --text-display-lg--letter-spacing: -0.025em;
+  --text-display-lg--font-weight: 700;
+
+  /* Typography — display-lg-mobile */
+  --text-display-lg-mobile: 28px;
+  --text-display-lg-mobile--line-height: 36px;
+  --text-display-lg-mobile--letter-spacing: -0.02em;
+  --text-display-lg-mobile--font-weight: 700;
+
+  /* Typography — headline-lg */
+  --text-headline-lg: 28px;
+  --text-headline-lg--line-height: 36px;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 600;
+
+  /* Typography — headline-lg-mobile */
+  --text-headline-lg-mobile: 22px;
+  --text-headline-lg-mobile--line-height: 30px;
+  --text-headline-lg-mobile--letter-spacing: -0.015em;
+  --text-headline-lg-mobile--font-weight: 600;
+
+  /* Typography — headline-md */
+  --text-headline-md: 20px;
+  --text-headline-md--line-height: 28px;
+  --text-headline-md--letter-spacing: -0.015em;
+  --text-headline-md--font-weight: 600;
+
+  /* Typography — headline-sm */
+  --text-headline-sm: 16px;
+  --text-headline-sm--line-height: 24px;
+  --text-headline-sm--letter-spacing: -0.01em;
+  --text-headline-sm--font-weight: 600;
+
+  /* Typography — body-lg */
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 26px;
+  --text-body-lg--letter-spacing: -0.005em;
+  --text-body-lg--font-weight: 400;
+
+  /* Typography — body-md */
+  --text-body-md: 14px;
+  --text-body-md--line-height: 22px;
+  --text-body-md--letter-spacing: 0em;
+  --text-body-md--font-weight: 400;
+
+  /* Typography — body-sm */
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 18px;
+  --text-body-sm--letter-spacing: 0em;
+  --text-body-sm--font-weight: 400;
+
+  /* Typography — tech-code-lg */
+  --text-tech-code-lg: 14px;
+  --text-tech-code-lg--line-height: 20px;
+  --text-tech-code-lg--letter-spacing: -0.01em;
+  --text-tech-code-lg--font-weight: 500;
+
+  /* Typography — tech-code-sm */
+  --text-tech-code-sm: 12px;
+  --text-tech-code-sm--line-height: 16px;
+  --text-tech-code-sm--letter-spacing: 0em;
+  --text-tech-code-sm--font-weight: 500;
+
+  /* Typography — caption-caps */
+  --text-caption-caps: 11px;
+  --text-caption-caps--line-height: 16px;
+  --text-caption-caps--letter-spacing: 0.05em;
+  --text-caption-caps--font-weight: 600;
+
+  /* Typography — label-tabular */
+  --text-label-tabular: 11px;
+  --text-label-tabular--line-height: 14px;
+  --text-label-tabular--letter-spacing: 0.02em;
+  --text-label-tabular--font-weight: 400;
+
+  /* Spacing */
+  --spacing-space-2xs: 0.125rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 0.75rem;
+  --spacing-space-base: 1rem;
+  --spacing-space-lg: 1.25rem;
+  --spacing-space-xl: 1.5rem;
+  --spacing-space-2xl: 2rem;
+  --spacing-space-3xl: 2.5rem;
+  --spacing-space-4xl: 3rem;
+  --spacing-gutter-mobile: 1rem;
+  --spacing-gutter-tablet: 1.5rem;
+  --spacing-gutter-desktop: 1.5rem;
+  --spacing-page-margin-desktop: 2rem;
+
+  /* Border Radius */
+  --radius-DEFAULT: 0.125rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Shadows — Elevation system */
+  --shadow-l1: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-l2:
+    0 4px 12px -2px rgba(15, 23, 42, 0.08),
+    0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-l3:
+    0 12px 24px -4px rgba(15, 23, 42, 0.12),
+    0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 4px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+
+  /* Max widths */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+
+  /* ─── Fluid Type Scale (Section 4 — clamp-based) ─── */
+  --text-hero: clamp(1.75rem, 4vw + 1rem, 3.25rem);
+  --text-h1: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
+  --text-h2: clamp(1.25rem, 1.8vw + 0.6rem, 1.75rem);
+  --text-body-fluid: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
+  --text-meta-fluid: clamp(0.8125rem, 0.2vw + 0.75rem, 0.875rem);
+}
+
+@layer base {
+  /* ── 1. LIGHT MODE: Modern Indian Civic Technology (Tricolour) ── */
+  :root {
+    /* Background & Surfaces (Warm Ivory / White) */
+    --background: #fdfcfb;
+    --surface: #ffffff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f6f5f2;
+    --surface-container: #efece7;
+    --surface-container-high: #e5e1db;
+    --surface-container-highest: #dbd6ce;
+    --surface-dim: #efece7;
+    --surface-bright: #ffffff;
+    --surface-variant: #e5e1db;
+    --surface-tint: #f26b22;
+
+    /* Primary (Saffron / Indian Orange) - Action, Discovery */
+    --primary: #e65c00;
+    --on-primary: #ffffff;
+    --primary-container: #ffdbc9;
+    --on-primary-container: #4d1900;
+    --primary-fixed: #ffdbc9;
+    --primary-fixed-dim: #ffb38c;
+    --on-primary-fixed: #4d1900;
+    --on-primary-fixed-variant: #802a00;
+    --inverse-primary: #ffb38c;
+
+    /* Secondary (Muted Gold) - Premium, Intelligence */
+    --secondary: #b89752;
+    --on-secondary: #3d2d0b;
+    --secondary-container: #f6ebce;
+    --on-secondary-container: #3d2d0b;
+    --secondary-fixed: #f6ebce;
+    --secondary-fixed-dim: #d9bb73;
+    --on-secondary-fixed: #3d2d0b;
+    --on-secondary-fixed-variant: #7a5b1b;
+
+    /* Tertiary (Deep India Green) - Verification, Compliance */
+    --tertiary: #0f6b06;
+    --on-tertiary: #ffffff;
+    --tertiary-container: #c8f0c2;
+    --on-tertiary-container: #032100;
+    --tertiary-fixed: #c8f0c2;
+    --tertiary-fixed-dim: #90d988;
+    --on-tertiary-fixed: #032100;
+    --on-tertiary-fixed-variant: #083d02;
+
+    /* Error */
+    --error: #ba1a1a;
+    --on-error: #ffffff;
+    --error-container: #ffdad6;
+    --on-error-container: #410002;
+
+    /* Background / On-Surface (Charcoal / Graphite for typography) */
+    --on-background: #1c1b1a;
+    --on-surface: #1c1b1a;
+    --on-surface-variant: #4a4643;
+
+    /* Outline */
+    --outline: #7d7672;
+    --outline-variant: #cfcac5;
+
+    /* Inverse */
+    --inverse-surface: #31302f;
+    --inverse-on-surface: #f5f0eb;
+
+    /* Semantic Status (Strict Tricolour mappings) */
+    --status-compliant-bg: #edf7ec;
+    --status-compliant-text: #0b5204;
+    --status-compliant-border: #c8e8c5;
+    --status-compliant-dot: #0f6b06;
+
+    --status-pending-bg: #fef3eb;
+    --status-pending-text: #a6460f;
+    --status-pending-border: #fcddc7;
+    --status-pending-dot: #f26b22;
+
+    --status-verify-bg: #ffedec;
+    --status-verify-text: #9e1c15;
+    --status-verify-border: #ffc4c2;
+    --status-verify-dot: #ba1a1a;
+
+    /* Tech ID uses Charcoal tint */
+    --tech-id-bg: #eae8e6;
+    --tech-id-text: #4a4643;
+    --tech-id-border: #cfcac5;
+
+    /* ─── Spec Token Aliases (Section 3 — Light) ─── */
+    --bg-base: #f7f6f2;
+    --bg-surface: #ffffff;
+    --bg-surface-raised: #fcfbf8;
+    --border-default: #e4e1d8;
+    --border-strong: #d3cfc2;
+    --text-primary-spec: #14202b;
+    --text-secondary-spec: #4a5563;
+    --text-tertiary-spec: #7a8390;
+    --accent-primary: #1e4b8f;
+    --accent-primary-hover: #163a70;
+    --status-verified: #1f6e43;
+    --status-pending-spec: #b8860b;
+    --status-error: #b3261e;
+    --status-info: #2a4a6b;
+    --accent-saffron: #c4622d;
+    --accent-neutral: #f7f6f2;
+    --accent-green: #1f6e43;
+    --mono-bg: #efede4;
+    --mono-fg: #14202b;
+  }
+
+  /* ── 2. DARK MODE: Graphite & Saffron ── */
+  .dark {
+    /* Background & Surfaces (Deep Charcoal / Graphite) */
+    --background: #121111;
+    --surface: #1a1919;
+    --surface-container-lowest: #0c0c0c;
+    --surface-container-low: #151414;
+    --surface-container: #1e1d1d;
+    --surface-container-high: #292828;
+    --surface-container-highest: #343332;
+    --surface-dim: #121111;
+    --surface-bright: #292828;
+    --surface-variant: #454341;
+    --surface-tint: #f26b22;
+
+    /* Primary (Saffron / Indian Orange) - Retains richness */
+    --primary: #f58c4f;
+    --on-primary: #3d1903;
+    --primary-container: #7a3306;
+    --on-primary-container: #ffdbc9;
+    --primary-fixed: #a34408;
+    --primary-fixed-dim: #f26b22;
+    --on-primary-fixed: #ffdbc9;
+    --on-primary-fixed-variant: #f58c4f;
+    --inverse-primary: #802a00;
+
+    /* Secondary (Muted Gold) */
+    --secondary: #d4b674;
+    --on-secondary: #302306;
+    --secondary-container: #5c430b;
+    --on-secondary-container: #f6ebce;
+    --secondary-fixed: #7a5b1b;
+    --secondary-fixed-dim: #b89752;
+    --on-secondary-fixed: #f6ebce;
+    --on-secondary-fixed-variant: #d4b674;
+
+    /* Tertiary (Deep India Green) - Adapted for Dark Mode */
+    --tertiary: #52b548;
+    --on-tertiary: #042401;
+    --tertiary-container: #094703;
+    --on-tertiary-container: #c8f0c2;
+    --tertiary-fixed: #0d6105;
+    --tertiary-fixed-dim: #0f6b06;
+    --on-tertiary-fixed: #c8f0c2;
+    --on-tertiary-fixed-variant: #52b548;
+
+    /* Error */
+    --error: #ffb4ab;
+    --on-error: #690005;
+    --error-container: #93000a;
+    --on-error-container: #ffdad6;
+
+    /* Background / On-Surface */
+    --on-background: #e8e6e3;
+    --on-surface: #e8e6e3;
+    --on-surface-variant: #cfcac5;
+
+    /* Outline */
+    --outline: #968f8a;
+    --outline-variant: #4a4643;
+
+    /* Inverse */
+    --inverse-surface: #e8e6e3;
+    --inverse-on-surface: #121111;
+
+    /* Semantic Status */
+    --status-compliant-bg: #0c210a;
+    --status-compliant-text: #52b548;
+    --status-compliant-border: #134011;
+    --status-compliant-dot: #52b548;
+
+    --status-pending-bg: #291203;
+    --status-pending-text: #f58c4f;
+    --status-pending-border: #4d2105;
+    --status-pending-dot: #f58c4f;
+
+    --status-verify-bg: #330507;
+    --status-verify-text: #ffb4ab;
+    --status-verify-border: #57090c;
+    --status-verify-dot: #ffb4ab;
+
+    /* Tech ID */
+    --tech-id-bg: #292828;
+    --tech-id-text: #cfcac5;
+    --tech-id-border: #4a4643;
+
+    /* ─── Spec Token Aliases (Section 3 — Dark) ─── */
+    --bg-base: #0f1620;
+    --bg-surface: #16202c;
+    --bg-surface-raised: #1c2836;
+    --border-default: #2a3542;
+    --border-strong: #3a4756;
+    --text-primary-spec: #f2f1ec;
+    --text-secondary-spec: #b8bfc9;
+    --text-tertiary-spec: #818b99;
+    --accent-primary: #6fa3e0;
+    --accent-primary-hover: #8fb8e8;
+    --status-verified: #4caf7d;
+    --status-pending-spec: #d9a441;
+    --status-error: #e5675f;
+    --status-info: #7fa8cc;
+    --accent-saffron: #d9773f;
+    --accent-neutral: #16202c;
+    --accent-green: #4caf7d;
+    --mono-bg: #1c2836;
+    --mono-fg: #e8e6dc;
+  }
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at top, rgba(230, 92, 0, 0.06), transparent 28%),
+    linear-gradient(
+      180deg,
+      var(--color-background) 0%,
+      color-mix(
+          in srgb,
+          var(--color-background) 92%,
+          var(--color-surface-container-low) 8%
+        )
+        100%
+    );
+  color: var(--color-on-surface);
+  font-size: var(--text-body-md);
+  line-height: var(--text-body-md--line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+.app-shell {
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-container-low);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
+
+/* ============================================
+   Typography Utility Classes
+   ============================================ */
+.text-display-lg {
+  font-family: var(--font-sans);
+  font-size: var(--text-display-lg);
+  line-height: var(--text-display-lg--line-height);
+  letter-spacing: var(--text-display-lg--letter-spacing);
+  font-weight: var(--text-display-lg--font-weight);
+}
+
+.text-display-lg-mobile {
+  font-family: var(--font-sans);
+  font-size: var(--text-display-lg-mobile);
+  line-height: var(--text-display-lg-mobile--line-height);
+  letter-spacing: var(--text-display-lg-mobile--letter-spacing);
+  font-weight: var(--text-display-lg-mobile--font-weight);
+}
+
+.text-headline-lg {
+  font-family: var(--font-sans);
+  font-size: var(--text-headline-lg);
+  line-height: var(--text-headline-lg--line-height);
+  letter-spacing: var(--text-headline-lg--letter-spacing);
+  font-weight: var(--text-headline-lg--font-weight);
+}
+
+.text-headline-md {
+  font-family: var(--font-sans);
+  font-size: var(--text-headline-md);
+  line-height: var(--text-headline-md--line-height);
+  letter-spacing: var(--text-headline-md--letter-spacing);
+  font-weight: var(--text-headline-md--font-weight);
+}
+
+.text-headline-sm {
+  font-family: var(--font-sans);
+  font-size: var(--text-headline-sm);
+  line-height: var(--text-headline-sm--line-height);
+  letter-spacing: var(--text-headline-sm--letter-spacing);
+  font-weight: var(--text-headline-sm--font-weight);
+}
+
+.text-body-lg {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-lg);
+  line-height: var(--text-body-lg--line-height);
+  letter-spacing: var(--text-body-lg--letter-spacing);
+}
+
+.text-body-md {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-md);
+  line-height: var(--text-body-md--line-height);
+  letter-spacing: var(--text-body-md--letter-spacing);
+}
+
+.text-body-sm {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm--line-height);
+  letter-spacing: var(--text-body-sm--letter-spacing);
+}
+
+.text-tech-code-lg {
+  font-family: var(--font-mono);
+  font-size: var(--text-tech-code-lg);
+  line-height: var(--text-tech-code-lg--line-height);
+  letter-spacing: var(--text-tech-code-lg--letter-spacing);
+  font-weight: var(--text-tech-code-lg--font-weight);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-tech-code-sm {
+  font-family: var(--font-mono);
+  font-size: var(--text-tech-code-sm);
+  line-height: var(--text-tech-code-sm--line-height);
+  letter-spacing: var(--text-tech-code-sm--letter-spacing);
+  font-weight: var(--text-tech-code-sm--font-weight);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-caption-caps {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption-caps);
+  line-height: var(--text-caption-caps--line-height);
+  letter-spacing: var(--text-caption-caps--letter-spacing);
+  font-weight: var(--text-caption-caps--font-weight);
+  text-transform: uppercase;
+}
+
+.text-label-tabular {
+  font-family: var(--font-mono);
+  font-size: var(--text-label-tabular);
+  line-height: var(--text-label-tabular--line-height);
+  letter-spacing: var(--text-label-tabular--letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Fluid Type Scale Utilities ─── */
+.text-hero {
+  font-size: var(--text-hero);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.text-h1 {
+  font-size: var(--text-h1);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+.text-h2 {
+  font-size: var(--text-h2);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Hero headings use Fraunces serif for editorial weight */
+.font-serif-hero {
+  font-family: var(--font-serif);
+}
+
+/* ─── Tech Identifier (IS / QCO number) Mono Tag ─── */
+.tech-id-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  background-color: var(--mono-bg);
+  color: var(--mono-fg);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* ─── Tricolor Accent Bar ─── */
+/* Spec: thin 3-segment bar under logo/hero heading only */
+.tricolor-bar {
+  display: flex;
+  height: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tricolor-bar::before {
+  content: "";
+  flex: 1;
+  background: var(--accent-saffron);
+}
+
+.tricolor-bar::after {
+  content: "";
+  flex: 1;
+  background: var(--accent-green);
+}
+
+.tricolor-bar-center {
+  flex: 1;
+  background: var(--border-default);
+}
+
+/* ─── Translation Loading Shimmer ─── */
+@keyframes text-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.translating-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container-low) 25%,
+    var(--color-surface-container-high) 50%,
+    var(--color-surface-container-low) 75%
+  );
+  background-size: 200% 100%;
+  animation: text-shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+  color: transparent !important;
+  user-select: none;
+}
+
+/* ============================================
+   Color Utility Classes (BIS-SATHI Custom)
+   ============================================ */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+.bg-on-primary {
+  background-color: var(--color-on-primary);
+}
+.bg-primary-container {
+  background-color: var(--color-primary-container);
+}
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+.bg-secondary-container {
+  background-color: var(--color-secondary-container);
+}
+.bg-surface {
+  background-color: var(--color-surface);
+}
+.bg-surface-dim {
+  background-color: var(--color-surface-dim);
+}
+.bg-surface-container-lowest {
+  background-color: var(--color-surface-container-lowest);
+}
+.bg-surface-container-low {
+  background-color: var(--color-surface-container-low);
+}
+.bg-surface-container {
+  background-color: var(--color-surface-container);
+}
+.bg-surface-container-high {
+  background-color: var(--color-surface-container-high);
+}
+.bg-surface-container-highest {
+  background-color: var(--color-surface-container-highest);
+}
+.bg-error {
+  background-color: var(--color-error);
+}
+.bg-error-container {
+  background-color: var(--color-error-container);
+}
+.bg-inverse-surface {
+  background-color: var(--color-inverse-surface);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+.text-on-primary {
+  color: var(--color-on-primary);
+}
+.text-on-primary-container {
+  color: var(--color-on-primary-container);
+}
+.text-secondary {
+  color: var(--color-secondary);
+}
+.text-on-secondary {
+  color: var(--color-on-secondary);
+}
+.text-tertiary {
+  color: var(--color-tertiary);
+}
+.text-on-tertiary-container {
+  color: var(--color-on-tertiary-container);
+}
+.text-on-surface {
+  color: var(--color-on-surface);
+}
+.text-on-surface-variant {
+  color: var(--color-on-surface-variant);
+}
+.text-on-primary-fixed {
+  color: var(--color-on-primary-fixed);
+}
+.text-on-primary-container {
+  color: var(--color-on-primary-container);
+}
+.text-primary-fixed-dim {
+  color: var(--color-primary-fixed-dim);
+}
+.text-secondary-fixed {
+  color: var(--color-secondary-fixed-dim);
+}
+.text-error {
+  color: var(--color-error);
+}
+.text-on-error-container {
+  color: var(--color-on-error-container);
+}
+.text-outline {
+  color: var(--color-outline);
+}
+.text-inverse-on-surface {
+  color: var(--color-inverse-on-surface);
+}
+
+.border-outline {
+  border-color: var(--color-outline);
+}
+.border-outline-variant {
+  border-color: var(--color-outline-variant);
+}
+
+/* ============================================
+   Spacing Utility Classes
+   ============================================ */
+.px-page-margin-desktop {
+  padding-left: var(--spacing-page-margin-desktop);
+  padding-right: var(--spacing-page-margin-desktop);
+}
+.max-w-content {
+  max-width: var(--breakpoint-2xl);
+}
+
+/* ============================================
+   Material Symbols Config
+   ============================================ */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  vertical-align: middle;
+}
+
+/* ============================================
+   Focus Styles
+   ============================================ */
+:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  .print-break {
+    page-break-before: always;
+  }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container-low) 25%,
+    var(--color-surface-container) 50%,
+    var(--color-surface-container-low) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes logo-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(-4px);
+    filter: drop-shadow(0 0 0px rgba(230, 92, 0, 0));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04) translateY(0);
+    filter: drop-shadow(0 0 10px rgba(230, 92, 0, 0.4));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+}
+
+.animate-logo-entrance {
+  animation: logo-entrance 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes tricolor-flow {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.tricolor-bar {
+  background: linear-gradient(
+    90deg,
+    #ff9933 0%,
+    #ff9933 25%,
+    #ffffff 40%,
+    #ffffff 60%,
+    #138808 75%,
+    #138808 100%
+  );
+  background-size: 200% 100%;
+  animation: tricolor-flow 4s linear infinite;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Glossy Premium Card Utilities (AI SATHI Premium)
+   ============================================ */
+.glossy-card {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-container-lowest) 0%,
+    var(--color-surface) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid
+    color-mix(in srgb, var(--color-outline-variant) 40%, transparent);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 8px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+  transition:
+    transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    background-color 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    border-color 0.25s cubic-bezier(0.33, 1, 0.68, 1);
+  overflow: hidden; /* For inner highlight/sheen containment */
+}
+
+.dark .glossy-card {
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-container-lowest) 0%,
+    var(--color-surface-container-low) 100%
+  );
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+  border: 1px solid
+    color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+}
+
+.glossy-card:hover {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    0 12px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px) scale(1.005);
+  border-color: color-mix(in srgb, var(--color-outline-variant) 70%, transparent);
+}
+
+.dark .glossy-card:hover {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 12px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+  border-color: color-mix(in srgb, var(--color-outline-variant) 50%, transparent);
+}
+
+/* Subtle inner highlight layer for premium cards */
+.glossy-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  opacity: 0.5;
+  transition: opacity 0.25s ease-out;
+}
+
+.dark .glossy-card::after {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+}
+
+.glossy-card:hover::after {
+  opacity: 1;
+}
+
+/* Subtle gloss sheen element inside the card, moving on hover */
+.gloss-sheen {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  pointer-events: none;
+  transition: left 0.7s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.dark .gloss-sheen {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.glossy-card:hover .gloss-sheen {
+  left: 200%;
+}
+
+/* The hero card enters from the side on desktop; keep that offset from cropping the stacked mobile layout. */
+@media (max-width: 1023px) {
+  .hero-stat-card {
+    transform: none !important;
+    translate: none !important;
+  }
+}
+
+/* AI Sathi command console: the active microphone uses a restrained terminal line. */
+.research-listening::before {
+  content: "";
+  position: absolute;
+  inset: -1px 0 auto;
+  z-index: 1;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--primary),
+    var(--secondary),
+    var(--primary),
+    transparent
+  );
+  background-size: 220% 100%;
+  animation: research-line-sweep 1.1s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes research-line-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .research-listening::before {
+    animation: none;
+    background: var(--primary);
+  }
+  .skeleton-shimmer {
+    animation: none;
+    background: var(--color-surface-container);
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    background:
+      radial-gradient(circle at top, rgba(230, 92, 0, 0.04), transparent 24%),
+      var(--color-background);
+  }
+
+  .glossy-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}

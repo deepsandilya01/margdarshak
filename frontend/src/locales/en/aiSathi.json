@@ -1,0 +1,98 @@
+{
+  "hero": {
+    "title": "AI SATHI",
+    "subtitle": "Your Intelligent Assistant for Indian Standards & BIS Services",
+    "description": "Ask anything about Indian Standards, BIS certification, QCOs, testing laboratories, hallmarking, compliance requirements, and related BIS services.",
+    "placeholder": "Ask anything about BIS...",
+    "capabilitiesTitle": "What AI SATHI can help you with",
+    "capabilities": [
+      "Find Applicable Standards",
+      "BIS Certification Guidance",
+      "QCO Information",
+      "Testing Laboratories",
+      "Compliance Guidance",
+      "Standards & Documents",
+      "Compare Standards",
+      "Hallmarking & Consumer Information"
+    ],
+    "trustTitle": "Trusted & Evidence-Based",
+    "trustText": "AI SATHI uses document-based retrieval and verified sources to provide grounded responses. Wherever supporting evidence is available, responses include source references and citations.",
+    "insufficientText": "If sufficient evidence is not available, AI SATHI clearly indicates that instead of generating unsupported information.",
+    "disclaimer": "AI SATHI provides informational guidance based on available BIS sources. It does not replace an official BIS determination, certification decision, or regulatory authority.",
+    "startPrompt": "Ask your question to get started."
+  },
+  "suggestions": {
+    "title": "SUGGESTED RESEARCH",
+    "general": {
+      "category": "GENERAL",
+      "text": "What is BIS?"
+    },
+    "certification": {
+      "category": "CERTIFICATION",
+      "text": "How do I get BIS certification?"
+    },
+    "standards": {
+      "category": "STANDARDS",
+      "text": "Which standard applies to my product?"
+    },
+    "qco": {
+      "category": "QCO",
+      "text": "Does this product have a QCO?"
+    },
+    "labs": {
+      "category": "LABS",
+      "text": "Find laboratories for this standard."
+    },
+    "consumer": {
+      "category": "CONSUMER",
+      "text": "How can I verify a BIS mark?"
+    }
+  },
+  "states": {
+    "synthesizing": "Synthesizing Intelligence",
+    "analyzing": "Analyzing intent and retrieving verified sources..."
+  },
+  "context": {
+    "active": "RESEARCH CONTEXT",
+    "related": "RELATED INTELLIGENCE",
+    "relatedDesc": "Contextual resources based on your active query intent.",
+    "actions": "ACTIONS",
+    "save": "Save",
+    "report": "Report",
+    "nextSteps": "SUGGESTED NEXT STEPS",
+    "evidence": "VERIFIED EVIDENCE"
+  },
+  "history": {
+    "search": "Search history...",
+    "recent": "RECENT RESEARCH",
+    "saved": "SAVED WORKSPACES"
+  },
+  "layouts": {
+    "knowledge": {
+      "title": "AI SATHI ANSWER",
+      "keyPoints": "KEY POINTS",
+      "whyItMatters": "WHY IT MATTERS",
+      "exploreMore": "EXPLORE MORE"
+    },
+    "process": {
+      "title": "PROCESS GUIDE",
+      "note": "This is a generalized pathway. The exact timeline and requirements may vary depending on whether the product falls under Scheme I (ISI Mark) or Scheme II (CRS)."
+    },
+    "applicability": {
+      "title": "APPLICABILITY ANALYSIS",
+      "product": "PRODUCT UNDERSTANDING",
+      "standards": "APPLICABLE STANDARDS",
+      "insight": "AI INSIGHT: APPLICABILITY",
+      "regStatus": "REGULATORY STATUS",
+      "qcoStatus": "QCO STATUS",
+      "testing": "TESTING REQUIREMENTS",
+      "testingBtn": "VIEW TESTING PROTOCOLS",
+      "certification": "CERTIFICATION PATHWAY",
+      "certBtn": "VIEW PROCESS GUIDE"
+    },
+    "comparison": {
+      "title": "COMPARISON WORKSPACE",
+      "diff": "DIFFERENCE"
+    }
+  }
+}
