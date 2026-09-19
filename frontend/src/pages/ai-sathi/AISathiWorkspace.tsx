@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useT as useTranslation } from '@/hooks/useTranslation';
 import { useSearchParams } from 'react-router-dom';
 import { parseIntent, type QueryIntent } from '@/features/ai-sathi/utils/intentEngine';
@@ -8,7 +10,6 @@ import ApplicabilityAnalysis from '@/features/ai-sathi/components/layouts/Applic
 import ComparisonWorkspace from '@/features/ai-sathi/components/layouts/ComparisonWorkspace';
 import { chatService, type ChatSession, type ChatMessage } from '@/features/ai-sathi/services/chatService';
 import type { LanguageCode } from '@/core/apiConfig';
-import { useAuth } from '@/context/AuthContext';
 
 declare global {
   interface Window {
@@ -46,7 +47,7 @@ const suggestionKeys = [
 
 export default function AISathiWorkspace() {
   const { t, i18n } = useTranslation(['aiSathi']);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   // Real-time Chat State
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -59,6 +60,8 @@ export default function AISathiWorkspace() {
   const [query, setQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isVoiceSupported, setIsVoiceSupported] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [retryText, setRetryText] = useState<string | null>(null);
   
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -73,8 +76,10 @@ export default function AISathiWorkspace() {
     try {
       const data = await chatService.getSessions();
       setSessions(data);
+      setHistoryError(null);
     } catch (error) {
       console.error("Failed to load sessions", error);
+      setHistoryError('Chat history is unavailable right now. You can still start a new chat.');
     }
   };
 
@@ -83,6 +88,7 @@ export default function AISathiWorkspace() {
       setActiveSessionId(sessionId);
       const data = await chatService.getSessionHistory(sessionId);
       setMessages(data);
+      setHistoryError(null);
       
       if (data.length > 0) {
         // Find last user message to set context
@@ -95,8 +101,19 @@ export default function AISathiWorkspace() {
       }
     } catch (error) {
       console.error("Failed to load session history", error);
+      setHistoryError('This conversation could not be loaded. You can start a new chat.');
+      setActiveSessionId(null);
+      setSearchParams(previous => {
+        previous.delete('session');
+        return previous;
+      }, { replace: true });
     }
   };
+
+  useEffect(() => {
+    const sessionId = searchParams.get('session');
+    if (sessionId && !activeSessionId) void loadSessionHistory(sessionId);
+  }, [searchParams, activeSessionId]);
 
   // Auto-scroll messages
   useEffect(() => {
@@ -141,10 +158,11 @@ export default function AISathiWorkspace() {
     setQuery(text);
     setInput('');
     setResearchState('understanding');
+    setRetryText(null);
     
     // Add optimistic user message
     const tempUserId = `temp-${Date.now()}`;
-    setMessages(prev => [...prev, { _id: tempUserId, role: 'user', content: text, createdAt: new Date().toISOString() }]);
+    setMessages(prev => [...prev, { id: tempUserId, role: 'user', content: text, createdAt: new Date().toISOString() }]);
 
     try {
       const response = await chatService.ask({
@@ -153,17 +171,33 @@ export default function AISathiWorkspace() {
         sessionId: activeSessionId || undefined,
         context: { source: 'ai-sathi-workspace' },
       });
+
+      if (response.status === 'service_unavailable') {
+        setMessages(prev => [...prev, {
+          id: `temp-error-${Date.now()}`,
+          role: 'assistant',
+          content: 'The AI service is temporarily unavailable. Please try again.',
+          createdAt: new Date().toISOString(),
+        }]);
+        setRetryText(text);
+        setResearchState('complete');
+        return;
+      }
       
       const intent = parseIntent(text);
       setQueryIntent(intent);
       
       if (!activeSessionId && response.sessionId) {
         setActiveSessionId(response.sessionId);
+        setSearchParams(previous => {
+          previous.set('session', response.sessionId!);
+          return previous;
+        }, { replace: true });
         loadSessions(); // reload sidebar
       }
 
       setMessages(prev => [...prev, { 
-        _id: `temp-assistant-${Date.now()}`, 
+        id: `temp-assistant-${Date.now()}`, 
         role: 'assistant', 
         content: response.answer.text, 
         createdAt: new Date().toISOString() 
@@ -182,11 +216,12 @@ export default function AISathiWorkspace() {
         errorMsg = 'Unable to connect to the server. Please check your connection and try again.';
       }
       setMessages(prev => [...prev, { 
-        _id: `temp-error-${Date.now()}`, 
+        id: `temp-error-${Date.now()}`, 
         role: 'assistant', 
         content: errorMsg, 
         createdAt: new Date().toISOString() 
       }]);
+      setRetryText(text);
       setResearchState('complete');
     }
   };
@@ -198,6 +233,13 @@ export default function AISathiWorkspace() {
     setInput('');
     setActiveSessionId(null);
     setMessages([]);
+    setHistoryError(null);
+    setRetryText(null);
+    setSearchParams(previous => {
+      previous.delete('session');
+      return previous;
+    }, { replace: true });
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   useEffect(() => {
@@ -241,18 +283,23 @@ export default function AISathiWorkspace() {
           </button>
         </div>
         <div className="flex-1 overflow-y-auto py-2">
+          {historyError && (
+            <div className="mx-3 mb-2 rounded-lg border border-error/20 bg-error/5 p-3 text-[12px] text-on-surface-variant">
+              {historyError}
+            </div>
+          )}
           {sessions.length === 0 ? (
             <div className="p-4 text-center text-on-surface-variant text-[13px]">No recent chats</div>
           ) : (
             sessions.map(session => (
               <button 
-                key={session._id} 
-                onClick={() => loadSessionHistory(session._id)}
-                className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-surface-container-low transition-colors ${activeSessionId === session._id ? 'bg-primary/5 border-r-2 border-primary' : ''}`}
+                key={session.id} 
+                onClick={() => loadSessionHistory(session.id)}
+                className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-surface-container-low transition-colors ${activeSessionId === session.id ? 'bg-primary/5 border-r-2 border-primary' : ''}`}
               >
                 <span className="material-symbols-outlined text-[16px] text-on-surface-variant shrink-0">chat_bubble</span>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[13px] truncate ${activeSessionId === session._id ? 'font-medium text-primary' : 'text-on-surface'}`}>
+                  <p className={`text-[13px] truncate ${activeSessionId === session.id ? 'font-medium text-primary' : 'text-on-surface'}`}>
                     {session.title}
                   </p>
                 </div>
@@ -289,14 +336,14 @@ export default function AISathiWorkspace() {
                 {/* PREMIUM GLOSSY INPUT */}
                 <div className={`w-full max-w-3xl relative glossy-card bg-surface/80 backdrop-blur-md rounded-2xl border border-outline-variant/50 shadow-lg shadow-primary/5 transition-all duration-300 focus-within:shadow-xl focus-within:shadow-primary/10 focus-within:border-primary/50 overflow-hidden ${isListening ? 'ring-2 ring-primary/30' : ''}`}>
                   <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
-                  <div className="flex min-h-[64px] items-center gap-3 px-4 py-2">
+                  <form className="flex min-h-[64px] items-center gap-3 px-4 py-2" onSubmit={event => { event.preventDefault(); void handleResearch(); }}>
                     <span className="material-symbols-outlined text-[24px] text-secondary shrink-0">search</span>
                     <input 
                       ref={inputRef}
                       autoFocus 
                       value={input} 
                       onChange={event => setInput(event.target.value)} 
-                      onKeyDown={event => event.key === 'Enter' && handleResearch()} 
+                      onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); void handleResearch(); } }}
                       placeholder={t('hero.placeholder')} 
                       className="min-w-0 flex-1 bg-transparent py-4 text-[15px] text-on-surface outline-none placeholder:text-on-surface-variant/60 font-medium" 
                     />
@@ -315,14 +362,14 @@ export default function AISathiWorkspace() {
                       <button 
                         type="button" 
                         aria-label="Run research" 
-                        onClick={() => handleResearch()} 
+                        onClick={() => void handleResearch()} 
                         disabled={!input.trim()} 
                         className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${input.trim() ? 'bg-primary text-on-primary shadow-md hover:brightness-110' : 'bg-surface-container text-on-surface-variant/40'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">arrow_upward</span>
                       </button>
                     </div>
-                  </div>
+                  </form>
                 </div>
 
                 <section className="w-full max-w-3xl mt-10 text-left" aria-labelledby="ai-sathi-capabilities">
@@ -380,13 +427,21 @@ export default function AISathiWorkspace() {
               {/* CHAT MESSAGES STREAM */}
               <div className="mx-auto w-full max-w-4xl flex flex-col gap-6">
                 {messages.map((msg, index) => (
-                  <div key={msg._id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] rounded-2xl px-5 py-3.5 ${
                       msg.role === 'user' 
                         ? 'bg-primary text-on-primary rounded-tr-sm shadow-md' 
                         : 'bg-surface-container-low text-on-surface rounded-tl-sm border border-outline-variant/40'
                     }`}>
-                      <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      {msg.role === 'user' ? (
+                        <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      ) : (
+                        <div className="prose prose-sm max-w-none text-[14px] leading-relaxed prose-p:text-on-surface prose-headings:text-primary prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-on-surface prose-strong:font-bold prose-ul:my-2 prose-li:my-0">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {msg.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -397,22 +452,19 @@ export default function AISathiWorkspace() {
                       <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
                       <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-75" />
                       <div className="w-2 h-2 rounded-full bg-primary animate-bounce delay-150" />
+                      <span className="text-[13px] text-on-surface-variant">AI SATHI is thinking...</span>
                     </div>
                   </div>
+                )}
+                {retryText && researchState === 'complete' && (
+                  <button type="button" onClick={() => { const text = retryText; setRetryText(null); void handleResearch(text); }} className="self-start rounded-lg border border-primary/30 px-3 py-2 text-[13px] text-primary hover:bg-primary/5">
+                    Retry
+                  </button>
                 )}
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* RICH WORKSPACE (Only shows for the latest complete intent) */}
-              {researchState === 'complete' && queryIntent && (
-                <div className="mx-auto w-full max-w-5xl mt-4 pt-6 border-t border-outline-variant/50">
-                  <div className="mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px] text-secondary">analytics</span>
-                    <span className="font-mono text-[10px] font-bold tracking-[0.16em] text-on-surface-variant">WORKSPACE VIEW</span>
-                  </div>
-                  {renderActiveWorkspace()}
-                </div>
-              )}
+              {/* RICH WORKSPACE removed per user request */}
             </div>
           )}
 
@@ -422,13 +474,14 @@ export default function AISathiWorkspace() {
               <div className="mx-auto flex max-w-4xl flex-col sm:flex-row items-center gap-4 justify-between">
                 
                 {/* Follow-up input */}
-                <div className="w-full relative flex items-center">
-                  <input 
+                <form className="w-full relative flex items-center" onSubmit={event => { event.preventDefault(); void handleResearch(); }}>
+                  <textarea 
+                    rows={1}
                     value={input} 
                     onChange={event => setInput(event.target.value)} 
-                    onKeyDown={event => event.key === 'Enter' && handleResearch()} 
+                    onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void handleResearch(); } }}
                     placeholder="Ask a follow-up question..." 
-                    className="w-full bg-surface-container rounded-xl pl-4 pr-[104px] py-3 text-[14px] text-on-surface outline-none focus:ring-2 focus:ring-primary/20 border border-transparent focus:border-primary/30 transition-all shadow-inner"
+                    className="w-full max-h-32 resize-none overflow-y-auto bg-surface-container rounded-xl pl-4 pr-[104px] py-3 text-[14px] leading-relaxed text-on-surface outline-none focus:ring-2 focus:ring-primary/20 border border-transparent focus:border-primary/30 transition-all shadow-inner"
                     disabled={researchState === 'understanding'}
                   />
                   <div className="absolute inset-y-0 right-2 flex items-center gap-1.5">
@@ -439,14 +492,14 @@ export default function AISathiWorkspace() {
                     )}
                     <button 
                       type="button" 
-                      onClick={() => handleResearch()} 
+                      onClick={() => void handleResearch()} 
                       disabled={!input.trim() || researchState === 'understanding'} 
                       className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${input.trim() && researchState !== 'understanding' ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container-high text-on-surface-variant/40'}`}
                     >
                       <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
                     </button>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
           )}

@@ -43,14 +43,14 @@ interface ApiEnvelope<T> {
 }
 
 export interface ChatSession {
-  _id: string;
+  id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ChatMessage {
-  _id: string;
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   createdAt: string;
@@ -60,9 +60,10 @@ class HttpChatService {
   /**
    * Send a chat message to the Primary Server.
    * POST /api/v1/chat
+   * Uses a longer timeout since AI processing (RAG + LLM) takes time.
    */
   public async ask(request: ChatRequest): Promise<ChatResponse> {
-    const res = await apiClient.post<ApiEnvelope<ChatResponse>>('/chat', request);
+    const res = await apiClient.post<ApiEnvelope<ChatResponse>>('/chat', request, { timeoutMs: 60000 });
     return res.data;
   }
 
