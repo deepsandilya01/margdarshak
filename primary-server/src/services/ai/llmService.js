@@ -65,7 +65,7 @@ const parseGeneratedText = (rawText) => {
 };
 
 export const generateAnswer = async ({ query, language, intent, evidence, webEvidence, history = [] }) => {
-  if (!env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
+  if (!env.GEMINI_API_KEY && !env.MISTRAL_API_KEY) throw new Error("No LLM provider is configured");
 
   const context = [...evidence, ...webEvidence].reduce((parts, item, index) => {
     const remaining = 12000 - parts.join("\n\n").length;
@@ -80,19 +80,27 @@ export const generateAnswer = async ({ query, language, intent, evidence, webEvi
     { role: "user", parts: [{ text: `Question: ${query}\n\nEvidence:\n${context || "No verified evidence was retrieved."}` }] },
   ];
 
-  const modelCandidates = getModelCandidates();
   let lastError = null;
 
-  // try {
-  //   const raw = await generateWithMistral({ systemInstruction, contents });
-  //   if (raw) {
-  //     const parsed = parseGeneratedText(raw);
-  //     return { text: parsed.text || "", citationIds: parsed.citationIds || [] };
-  //   }
-  // } catch (error) {
-  //   lastError = error;
-  //   console.warn(`[AI] Mistral generation failed, falling back to Gemini. Error: ${error.message}`);
-  // }
+  if (env.MISTRAL_API_KEY) {
+    try {
+      const raw = await generateWithMistral({ systemInstruction, contents });
+      if (raw) {
+        const parsed = parseGeneratedText(raw);
+        return { text: parsed.text || "", citationIds: parsed.citationIds || [] };
+      }
+    } catch (error) {
+      lastError = error;
+      console.warn("[AI] Mistral generation failed; attempting configured fallback provider", {
+        provider: "mistral",
+        status: error?.response?.status || null,
+      });
+    }
+  }
+
+  if (!env.GEMINI_API_KEY) throw lastError || new Error("GEMINI_API_KEY is not configured");
+
+  const modelCandidates = getModelCandidates();
 
   for (let index = 0; index < modelCandidates.length; index += 1) {
     const modelName = modelCandidates[index];

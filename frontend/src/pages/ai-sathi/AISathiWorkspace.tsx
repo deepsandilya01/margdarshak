@@ -45,6 +45,14 @@ const suggestionKeys = [
   'consumer'
 ];
 
+const citationDomain = (url: string) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+};
+
 export default function AISathiWorkspace() {
   const { t, i18n } = useTranslation(['aiSathi']);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -200,6 +208,9 @@ export default function AISathiWorkspace() {
         id: `temp-assistant-${Date.now()}`, 
         role: 'assistant', 
         content: response.answer.text, 
+        status: response.status,
+        citations: response.citations,
+        evidence: response.evidence,
         createdAt: new Date().toISOString() 
       }]);
 
@@ -436,10 +447,38 @@ export default function AISathiWorkspace() {
                       {msg.role === 'user' ? (
                         <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       ) : (
-                        <div className="prose prose-sm max-w-none text-[14px] leading-relaxed prose-p:text-on-surface prose-headings:text-primary prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-on-surface prose-strong:font-bold prose-ul:my-2 prose-li:my-0">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <div className="space-y-4">
+                          {msg.status === 'insufficient_evidence' && (
+                            <div className="rounded-lg border border-secondary/30 bg-secondary/5 px-3 py-2 text-[12px] text-on-surface-variant">
+                              This answer could not be verified from the available BIS documents or official web sources. Try rephrasing the question or check bis.gov.in.
+                            </div>
+                          )}
+                          <div className="prose prose-sm max-w-none text-[14px] leading-relaxed prose-p:text-on-surface prose-headings:text-primary prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-on-surface prose-strong:font-bold prose-ul:my-2 prose-li:my-0">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            skipHtml
+                            components={{
+                              a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                            }}
+                          >
                             {msg.content}
                           </ReactMarkdown>
+                          </div>
+                          {msg.citations && msg.citations.length > 0 && (
+                            <section aria-label="Sources" className="border-t border-outline-variant/40 pt-3">
+                              <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Sources</h3>
+                              <div className="grid gap-2">
+                                {msg.citations.map((citation, citationIndex) => (
+                                  <a key={citation.id} href={citation.url || undefined} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-outline-variant/50 px-3 py-2 text-[12px] hover:border-primary/50">
+                                    <span className="mr-2 font-semibold text-primary">[{citationIndex + 1}]</span>
+                                    <span className="font-medium text-on-surface">{citation.title}</span>
+                                    {citation.page ? <span className="ml-2 text-on-surface-variant">Page {citation.page}</span> : null}
+                                    {citation.url ? <span className="mt-1 block truncate text-on-surface-variant">{citationDomain(citation.url)}</span> : null}
+                                  </a>
+                                ))}
+                              </div>
+                            </section>
+                          )}
                         </div>
                       )}
                     </div>

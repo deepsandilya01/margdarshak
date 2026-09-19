@@ -101,6 +101,7 @@ export const getSessionMessages = async (userId, sessionId) => {
     content: m.content,
     language: m.language,
     evidence: m.evidence || [],
+    citations: m.citations || [],
     related: m.related || { standards: [], qcos: [], labs: [] },
     status: m.status,
     requestId: m.requestId,

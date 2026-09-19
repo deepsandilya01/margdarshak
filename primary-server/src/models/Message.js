@@ -52,6 +52,10 @@ const messageSchema = new mongoose.Schema(
       type: [evidenceSchema],
       default: [],
     },
+    citations: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+    },
     related: {
       standards: { type: [String], default: [] },
       qcos: { type: [String], default: [] },

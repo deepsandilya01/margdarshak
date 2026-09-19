@@ -11,14 +11,16 @@ export const sendMessage = asyncHandler(async (req, res) => {
   // Cache Key Generation (deterministic elements only)
   const cachePayload = `${req.user._id}:${sessionId}:${resolvedLanguage}:${message}`;
   const cacheHash = crypto.createHash("sha256").update(cachePayload).digest("hex");
-  const cacheKey = `cache:ai:v2:${cacheHash}`;
+  const cacheKey = `cache:ai:v3:${cacheHash}`;
 
   if (redisService.isRedisReady()) {
     const cachedResponse = await redisService.get(cacheKey);
     if (cachedResponse) {
       try {
         const parsed = JSON.parse(cachedResponse);
-        return new ApiResponse(200, parsed, "Message processed successfully (cached)").send(res);
+        if (parsed?.status === "success") {
+          return new ApiResponse(200, parsed, "Message processed successfully (cached)").send(res);
+        }
       } catch (e) {
         // Ignore parse error and proceed to normal processing
       }

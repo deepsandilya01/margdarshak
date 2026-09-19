@@ -53,6 +53,9 @@ export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  status?: ChatStatus;
+  citations?: ChatCitation[];
+  evidence?: Record<string, unknown>[];
   createdAt: string;
 }
 

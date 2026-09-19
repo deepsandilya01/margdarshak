@@ -59,6 +59,7 @@ export const processChat = async ({ userId, sessionId, message, language = "auto
     content: aiResult.answer.text || "Processing complete.",
     language: aiResult.answer.language || language,
     evidence: aiResult.evidence || [],
+    citations: aiResult.citations || [],
     related: aiResult.related || { standards: [], qcos: [], labs: [] },
     status: aiResult.status || "success",
     requestId: aiResult.requestId,

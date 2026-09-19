@@ -8,9 +8,10 @@ import citationValidator from "./citationValidator.js";
 
 const requestId = () => `req-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 
-const isCurrentInfoQuery = (query = "") => {
+export const isCurrentInfoQuery = (query = "") => {
   const text = String(query).toLowerCase();
-  return /(latest|current|newest|recent|up-to-date|as of|in 202[0-9]|202[0-9]|today|this year)/i.test(text);
+  return /(latest|current|newest|recent|up-to-date|as of|today|this year|updated|notification|नवीनतम|ताज़ा|आज|अभी|नया|हालिया|अपडेट)/i.test(text)
+    || /\b20\d{2}\b/.test(text);
 };
 
 const isInsufficientAnswerText = (text = "") => {
@@ -22,6 +23,10 @@ export const process = async ({ message, language = "auto", context = {}, histor
   const id = requestId();
   const detectedLanguage = languageDetector(message, language);
   const intent = intentDetector(message);
+  const previousUserTurn = [...history].reverse().find((item, index) => item.role === "user" && index > 0);
+  const rewrittenQuery = intent === "followup" && previousUserTurn?.content
+    ? `${previousUserTurn.content}\nFollow-up question: ${message}`
+    : message;
 
   if (intent === "conversational") {
     const greetingText = detectedLanguage === "hi"
@@ -40,23 +45,42 @@ export const process = async ({ message, language = "auto", context = {}, histor
     };
   }
 
+  if (intent === "out_of_scope") {
+    const redirect = detectedLanguage === "hi"
+      ? "मैं AI SATHI हूँ और BIS तथा भारतीय मानकों से जुड़े प्रश्नों में सहायता कर सकता हूँ। कृपया BIS certification, standards या compliance के बारे में पूछें।"
+      : detectedLanguage === "hinglish"
+        ? "Main AI SATHI hoon aur BIS aur Indian Standards se jude sawalon mein madad kar sakta hoon. BIS certification, standards ya compliance ke baare mein poochhiye."
+        : "I'm AI SATHI, focused on BIS and Indian Standards. Please ask about BIS certification, standards, QCOs, testing laboratories, or compliance.";
+    return {
+      requestId: id,
+      status: "success",
+      intent,
+      language: detectedLanguage,
+      answer: { text: redirect, language: detectedLanguage },
+      evidence: [],
+      citations: [],
+      related: { standards: [], qcos: [], labs: [] },
+      actions: [],
+    };
+  }
+
   let rag = { evidence: [], sufficient: false, score: 0, coverage: 0 };
   let webEvidence = [];
   const pdfEvidence = Array.isArray(rag.evidence) ? rag.evidence : [];
 
   try {
-    rag = await ragService.retrieve({ query: message, context });
+    rag = await ragService.retrieve({ query: rewrittenQuery, context });
   } catch (error) {
     console.warn(`[AI] RAG retrieval failed for ${id}: ${error.message}`);
   }
 
   const pdfEvidenceNow = Array.isArray(rag.evidence) ? rag.evidence : [];
   const pdfSufficient = Boolean(rag.sufficient) && pdfEvidenceNow.length > 0;
-  const shouldFallbackToWeb = !pdfSufficient || isCurrentInfoQuery(message);
+  const shouldFallbackToWeb = !pdfSufficient || isCurrentInfoQuery(rewrittenQuery);
 
   if (shouldFallbackToWeb) {
     try {
-      webEvidence = await tavilyService.search(message);
+      webEvidence = await tavilyService.search(rewrittenQuery);
     } catch (error) {
       console.warn(`[AI] Tavily fallback failed for ${id}: ${error.message}`);
     }
@@ -96,7 +120,7 @@ export const process = async ({ message, language = "auto", context = {}, histor
   }
 
   try {
-    const generated = await llmService.generateAnswer({ query: message, language: detectedLanguage, intent, evidence: pdfEvidenceNow, webEvidence: validWebEvidence, history });
+    const generated = await llmService.generateAnswer({ query: rewrittenQuery, language: detectedLanguage, intent, evidence: pdfEvidenceNow, webEvidence: validWebEvidence, history });
     const evidenceById = new Map(allEvidence.map((item) => [item.id, item]));
     const citations = citationValidator.validateCitations(generated.citationIds.map((id) => evidenceById.get(id)).filter(Boolean), allEvidence);
 

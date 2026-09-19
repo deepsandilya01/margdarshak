@@ -29,6 +29,15 @@ test("detects English, Hindi, and Hinglish queries", () => {
 test("classifies BIS intent", () => {
   assert.equal(intentDetector("What are the requirements of IS 1293?"), "standard_research");
   assert.equal(intentDetector("What is the QCO for this product?"), "qco_information");
+  assert.equal(intentDetector("hi"), "conversational");
+  assert.equal(intentDetector("best pizza in Delhi"), "out_of_scope");
+  assert.equal(intentDetector("What documents do I need?"), "followup");
+});
+
+test("detects current Hindi and year-based queries", async () => {
+  const { isCurrentInfoQuery } = await import("../src/services/ai/aiOrchestrator.js");
+  assert.equal(isCurrentInfoQuery("2026 में नवीनतम QCO क्या है?"), true);
+  assert.equal(isCurrentInfoQuery("What is BIS?"), false);
 });
 
 test("requires score, evidence count, and query coverage", () => {
@@ -186,5 +195,21 @@ test("TEST F: Hinglish query answers naturally in Hinglish from grounded evidenc
   assert.equal(result.status, "success");
   assert.equal(result.answer.language, "hinglish");
   assert.equal(result.answer.text.includes("testing aur marking"), true);
+  restoreServices();
+});
+
+test("out-of-scope queries do not invoke retrieval or web search", async () => {
+  let ragCalled = false;
+  let tavilyCalled = false;
+  ragService.retrieve = async () => { ragCalled = true; return { evidence: [] }; };
+  tavilyService.search = async () => { tavilyCalled = true; return []; };
+
+  const result = await aiOrchestrator.process({ message: "best pizza in Delhi", language: "en", history: [] });
+
+  assert.equal(result.status, "success");
+  assert.equal(result.intent, "out_of_scope");
+  assert.equal(result.citations.length, 0);
+  assert.equal(ragCalled, false);
+  assert.equal(tavilyCalled, false);
   restoreServices();
 });
